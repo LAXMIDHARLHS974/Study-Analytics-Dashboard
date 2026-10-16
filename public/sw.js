@@ -1,10 +1,13 @@
-const CACHE_NAME = 'build-lhs-v1';
+const CACHE_NAME = 'build-lhs-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/pwa-192x192.png',
-  '/pwa-512x512.png'
+  '/pwa-512x512.png',
+  '/maskable-icon-512x512.png',
+  '/favicon.png',
+  '/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {

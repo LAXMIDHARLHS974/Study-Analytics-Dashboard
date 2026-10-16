@@ -1,16 +1,16 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Clock, 
-  CalendarDays, 
-  CalendarRange, 
-  Target, 
-  BookMarked, 
-  BarChart3, 
-  Settings, 
-  Timer, 
-  Sparkles, 
+import {
+  LayoutDashboard,
+  Clock,
+  CalendarDays,
+  CalendarRange,
+  Target,
+  BookMarked,
+  BarChart3,
+  Settings,
+  Timer,
+  Sparkles,
   Crown,
   Layers,
   Flame,
@@ -59,17 +59,13 @@ export default function Sidebar({ isOpen, onClose }) {
               className="w-full h-full object-cover rounded-xl ring-2 ring-slate-900 shadow-inner"
             />
           </div>
-          <div className="absolute -bottom-1 -right-1 bg-brand-mint text-[10px] text-slate-950 font-bold px-2 py-0.5 rounded-md shadow-md flex items-center gap-0.5">
-            <Flame className="w-3 h-3 fill-amber-300 text-amber-500" />
-            <span>7d</span>
-          </div>
         </div>
 
         <h2 className="mt-3 text-lg font-bold text-white tracking-wide flex items-center gap-1.5">
           <span>Hi, {userName}!</span>
           <span className="text-brand-teal text-sm">✨</span>
         </h2>
-        <p className="text-xs text-slate-400 font-medium">Ready for high focus</p>
+        <p className="text-xs text-slate-400 font-medium">Fuck Your Emotions</p>
       </div>
 
       {/* Navigation List with Neumorphic Active States */}
@@ -83,21 +79,19 @@ export default function Sidebar({ isOpen, onClose }) {
               onClick={() => onClose && onClose()}
               className={({ isActive }) => `
                 flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-200
-                ${
-                  isActive
-                    ? 'bg-gradient-to-r from-[#2F3F5B] to-[#394B6B] text-white shadow-sidebar-nav border-t border-slate-500/30 text-white font-bold'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/40'
+                ${isActive
+                  ? 'bg-gradient-to-r from-[#2F3F5B] to-[#394B6B] text-white shadow-sidebar-nav border-t border-slate-500/30 text-white font-bold'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/40'
                 }
               `}
             >
               {({ isActive }) => (
                 <>
                   <div
-                    className={`w-7 h-7 rounded-xl flex items-center justify-center transition-colors ${
-                      isActive
+                    className={`w-7 h-7 rounded-xl flex items-center justify-center transition-colors ${isActive
                         ? 'bg-brand-teal/20 text-brand-teal'
                         : 'text-slate-400 group-hover:text-slate-200'
-                    }`}
+                      }`}
                   >
                     <Icon className="w-4 h-4" />
                   </div>

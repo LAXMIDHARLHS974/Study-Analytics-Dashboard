@@ -23,9 +23,9 @@ export default function StatCards() {
       value: `${completedTasks.length}`,
       subtext: `${completedTasks.length > 0 ? `${completedTasks.length} done` : 'No tasks done yet'}`,
       icon: CheckCircle2,
-      iconBg: 'bg-[#5FB3B3]',
+      iconBg: 'bg-gradient-to-tr from-[#2563EB] to-[#60A5FA]',
       iconColor: 'text-white',
-      badgeColor: 'text-teal-700 dark:text-teal-300 bg-teal-100/60 dark:bg-teal-950/40',
+      badgeColor: 'text-royal-300 bg-royal-500/20 border border-royal-500/30',
     },
     {
       id: 'study-hours',
@@ -34,9 +34,9 @@ export default function StatCards() {
       unit: 'hrs',
       subtext: `${weeklyDelta >= 0 ? '+' : ''}${weeklyDelta}h vs last week`,
       icon: Clock,
-      iconBg: 'bg-[#6A9AC4]',
+      iconBg: 'bg-gradient-to-tr from-[#1D4ED8] to-[#3B82F6]',
       iconColor: 'text-white',
-      badgeColor: 'text-blue-700 dark:text-blue-300 bg-blue-100/60 dark:bg-blue-950/40',
+      badgeColor: 'text-blue-300 bg-blue-500/20 border border-blue-500/30',
     },
     {
       id: 'streak',
@@ -45,9 +45,9 @@ export default function StatCards() {
       unit: currentStreak === 1 ? 'day' : 'days',
       subtext: studiedToday ? 'Active today 🔥' : currentStreak > 0 ? 'Study to keep 🔥' : 'Start streak today',
       icon: Flame,
-      iconBg: 'bg-[#7B7FBF]',
+      iconBg: 'bg-gradient-to-tr from-[#7C3AED] to-[#A855F7]',
       iconColor: 'text-white',
-      badgeColor: 'text-purple-700 dark:text-purple-300 bg-purple-100/60 dark:bg-purple-950/40',
+      badgeColor: 'text-violet-neon-bright bg-violet-neon/20 border border-violet-neon/30',
     },
     {
       id: 'pending-tasks',
@@ -55,9 +55,9 @@ export default function StatCards() {
       value: `${pendingTasks.length}`,
       subtext: pendingTasks.length === 1 ? '1 task left' : `${pendingTasks.length} tasks left`,
       icon: ListTodo,
-      iconBg: 'bg-[#52A5B5]',
+      iconBg: 'bg-gradient-to-tr from-[#2563EB] to-[#8B5CF6]',
       iconColor: 'text-white',
-      badgeColor: 'text-cyan-700 dark:text-cyan-300 bg-cyan-100/60 dark:bg-cyan-950/40',
+      badgeColor: 'text-purple-300 bg-purple-500/20 border border-purple-500/30',
     },
   ];
 

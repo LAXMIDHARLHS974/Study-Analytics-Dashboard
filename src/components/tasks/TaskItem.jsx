@@ -69,10 +69,10 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
   if (variant === 'square') {
     return (
       <div
-        className={`group relative p-3 rounded-xl border transition-all duration-200 flex flex-col justify-between shadow-sm hover:shadow-md ${
+        className={`group relative p-3 rounded-xl border transition-all duration-200 flex flex-col justify-between shadow-xs hover:shadow-md backdrop-blur-md ${
           isDone
-            ? 'bg-slate-200/30 dark:bg-slate-900/40 border-slate-300/30 dark:border-slate-800/60 opacity-65'
-            : 'bg-white/70 dark:bg-slate-800/80 hover:bg-white/95 dark:hover:bg-slate-800 border-white/80 dark:border-slate-700/70'
+            ? 'bg-slate-200/30 dark:bg-slate-900/30 border-slate-300/30 dark:border-slate-800/40 opacity-60'
+            : 'bg-white/65 dark:bg-slate-800/65 hover:bg-white/85 dark:hover:bg-slate-800/85 border-white/70 dark:border-white/10'
         }`}
       >
         {/* Top: Subject badge & Menu */}
@@ -100,19 +100,19 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
                   e.stopPropagation();
                   setMenuOpen(!menuOpen);
                 }}
-                className="w-6 h-6 rounded-md hover:bg-slate-300/40 dark:hover:bg-slate-700/60 flex items-center justify-center text-slate-400 hover:text-slate-200"
+                className="w-6 h-6 rounded-md hover:bg-white/20 dark:hover:bg-slate-700/60 flex items-center justify-center text-slate-400 hover:text-slate-200"
               >
                 <MoreVertical className="w-3.5 h-3.5" />
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 top-7 w-32 py-1 rounded-xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 z-50 text-xs font-semibold animate-in fade-in">
+                <div className="absolute right-0 top-7 w-32 py-1 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-2xl shadow-2xl border border-white/80 dark:border-slate-700 z-50 text-xs font-semibold animate-in fade-in">
                   <button
                     onClick={() => {
                       setMenuOpen(false);
                       onEdit(task);
                     }}
-                    className="w-full px-2.5 py-1.5 text-left flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
+                    className="w-full px-2.5 py-1.5 text-left flex items-center gap-1.5 hover:bg-white/40 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200"
                   >
                     <Edit3 className="w-3 h-3" /> Edit
                   </button>
@@ -121,7 +121,7 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
                       setMenuOpen(false);
                       duplicateTask(task.id);
                     }}
-                    className="w-full px-2.5 py-1.5 text-left flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
+                    className="w-full px-2.5 py-1.5 text-left flex items-center gap-1.5 hover:bg-white/40 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200"
                   >
                     <Copy className="w-3 h-3" /> Duplicate
                   </button>
@@ -130,7 +130,7 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
                       setMenuOpen(false);
                       deleteTask(task.id);
                     }}
-                    className="w-full px-2.5 py-1.5 text-left flex items-center gap-1.5 text-brand-coral hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                    className="w-full px-2.5 py-1.5 text-left flex items-center gap-1.5 text-brand-coral hover:bg-rose-50/50 dark:hover:bg-rose-950/40"
                   >
                     <Trash2 className="w-3 h-3" /> Delete
                   </button>
@@ -190,13 +190,13 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
     );
   }
 
-  // STANDARD ROW LAYOUT (with 12h time and square buttons)
+  // STANDARD ROW LAYOUT (with 12h time and liquid glass background)
   return (
     <div
-      className={`group relative flex items-center justify-between p-3 rounded-xl transition-all duration-200 border ${
+      className={`group relative flex items-center justify-between p-3 rounded-xl transition-all duration-200 border backdrop-blur-md ${
         isDone
-          ? 'bg-slate-200/40 dark:bg-slate-900/30 border-slate-300/40 dark:border-slate-800/60 opacity-60'
-          : 'bg-white/60 dark:bg-slate-800/60 hover:bg-white/90 dark:hover:bg-slate-800/90 border-white/80 dark:border-slate-700/60 shadow-sm hover:shadow-md'
+          ? 'bg-slate-200/30 dark:bg-slate-900/30 border-slate-300/30 dark:border-slate-800/40 opacity-60'
+          : 'bg-white/65 dark:bg-slate-800/65 hover:bg-white/85 dark:hover:bg-slate-800/85 border-white/70 dark:border-white/10 shadow-xs hover:shadow-md'
       }`}
     >
       {/* Left: Square Checkbox & Task details */}

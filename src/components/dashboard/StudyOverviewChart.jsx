@@ -19,15 +19,15 @@ export default function StudyOverviewChart() {
   const data = calculateWeeklyBarData(timerLogs, timeRange);
   const totalWeekly = data.reduce((acc, item) => acc + (item.hours || 0), 0).toFixed(1);
 
-  // Bar colors matching the soft teal-to-blue-to-purple sequence from screenshot
+  // Bar colors matching Royal Blue to Neon Violet gradient sequence
   const barColors = [
-    '#A0D0D0', // Mon
-    '#68C2C2', // Tue
-    '#5FB3B3', // Wed
-    '#4899A8', // Thu
-    '#5889B6', // Fri
-    '#6A9AC4', // Sat
-    '#7B7FBF', // Sun
+    '#2563EB', // Mon (Royal Blue)
+    '#3B82F6', // Tue (Royal Light)
+    '#60A5FA', // Wed (Bright Blue)
+    '#7C3AED', // Thu (Deep Violet)
+    '#8B5CF6', // Fri (Violet Glow)
+    '#A855F7', // Sat (Neon Violet)
+    '#C084FC', // Sun (Bright Violet)
   ];
 
   const CustomTooltip = ({ active, payload }) => {

@@ -105,7 +105,7 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
           <button
             onClick={onOpenSidebar}
             aria-label="Toggle Navigation Menu"
-            className="md:hidden p-2 rounded-xl bg-white/70 dark:bg-slate-800/80 shadow-md border border-white/50 dark:border-slate-700/60 active:scale-95 transition-all text-slate-700 dark:text-slate-200 shrink-0"
+            className="md:hidden p-2 rounded-xl bg-[#0E1636]/80 backdrop-blur-md shadow-md border border-white/10 active:scale-95 transition-all text-slate-200 shrink-0"
           >
             <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
@@ -114,7 +114,7 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
             <h1 className="text-base sm:text-2xl lg:text-3xl font-extrabold tracking-tight embossed-title text-slate-800 dark:text-white truncate">
               {getPageTitle()}
             </h1>
-            <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 hidden sm:block truncate">
+            <p className="text-[11px] sm:text-xs text-slate-400 hidden sm:block truncate">
               {format(new Date(), 'EEEE, MMMM do, yyyy')} • Let's keep building!
             </p>
           </div>
@@ -126,14 +126,14 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
           <button
             onClick={() => setShowMobileSearch(!showMobileSearch)}
             aria-label="Toggle Search"
-            className="md:hidden p-2 rounded-full neu-pill-btn text-slate-700 dark:text-slate-200"
+            className="md:hidden p-2 rounded-full neu-pill-btn text-slate-200"
           >
             <Search className="w-4 h-4" />
           </button>
 
           {/* Desktop Neumorphic Search Bar */}
           <div className="relative hidden md:block w-48 lg:w-72">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 dark:text-slate-400">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
               <Search className="w-4 h-4" />
             </div>
             <input
@@ -142,12 +142,12 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search tasks, subjects... [ / ]"
-              className="w-full pl-9 pr-8 py-2 text-xs lg:text-sm font-medium rounded-full neu-inset border border-white/50 dark:border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-brand-teal/50 text-slate-800 dark:text-slate-100 placeholder:text-slate-500/80 transition-all"
+              className="w-full pl-9 pr-8 py-2 text-xs lg:text-sm font-medium rounded-full neu-inset border border-white/10 focus:outline-none focus:ring-2 focus:ring-royal-500/60 focus:border-royal-400/50 text-white placeholder:text-slate-400/70 transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-400 hover:text-slate-600"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-400 hover:text-white"
               >
                 ✕
               </button>
@@ -159,8 +159,8 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
             onClick={() => navigate('/timer')}
             className={`hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-md ${
               isTimerRunning
-                ? 'bg-gradient-to-r from-brand-teal to-emerald-500 text-white animate-pulse'
-                : 'neu-pill-btn text-slate-700 dark:text-slate-200'
+                ? 'bg-gradient-to-r from-royal-600 to-violet-neon text-white shadow-[0_0_15px_rgba(139,92,246,0.5)] animate-pulse'
+                : 'neu-pill-btn text-slate-200'
             }`}
             title="Open Focus Timer"
           >
@@ -175,7 +175,7 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               aria-label="View notifications"
-              className="p-2 sm:p-2.5 rounded-full neu-pill-btn relative text-slate-700 dark:text-slate-200 hover:text-brand-teal"
+              className="p-2 sm:p-2.5 rounded-full neu-pill-btn relative text-slate-200 hover:text-royal-400"
             >
               <Bell className="w-4 h-4" />
               {overdueTasks.length > 0 && (
@@ -188,12 +188,12 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
             {/* Notifications Flyout */}
             {showNotifications && (
               <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto right-auto sm:right-0 top-16 sm:top-auto sm:mt-3 w-auto sm:w-96 max-w-sm clay-card p-4 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-300/40 dark:border-slate-700/60">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <div className="flex items-center gap-2">
-                    <Bell className="w-4 h-4 text-brand-teal" />
-                    <h3 className="text-sm font-bold text-slate-800 dark:text-white">Study Alerts</h3>
+                    <Bell className="w-4 h-4 text-royal-400" />
+                    <h3 className="text-sm font-bold text-white">Study Alerts</h3>
                   </div>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-brand-teal/20 text-brand-teal font-semibold">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-royal-500/20 text-royal-300 border border-royal-500/30 font-semibold">
                     {overdueTasks.length} overdue
                   </span>
                 </div>

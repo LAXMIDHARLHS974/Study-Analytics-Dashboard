@@ -6,8 +6,9 @@
   * {
     box-sizing: border-box;
   }
-  
-  html, body {
+
+  html,
+  body {
     margin: 0;
     padding: 0;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -18,32 +19,38 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  button, a, input, select, textarea {
+  button,
+  a,
+  input,
+  select,
+  textarea {
     touch-action: manipulation;
   }
 
-  /* Custom subtle scrollbar */
+  /* Custom subtle liquid glass scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(75, 100, 130, 0.35);
+    background: rgba(95, 179, 179, 0.35);
+    backdrop-filter: blur(8px);
     border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(75, 100, 130, 0.55);
+    background: rgba(95, 179, 179, 0.6);
   }
 
   .dark ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.1);
   }
 
   .dark ::-webkit-scrollbar-thumb {
@@ -52,129 +59,186 @@
 }
 
 @layer components {
-  /* Square-Type Frosted Clay/Glass Card */
-  .clay-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 245, 250, 0.55) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    box-shadow: 
-      10px 14px 28px rgba(26, 42, 68, 0.12),
-      -4px -4px 16px rgba(255, 255, 255, 0.8),
-      inset 1px 1px 2px rgba(255, 255, 255, 0.95);
-    border-radius: 14px;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  /* ====================================================================
+     TRUE LIQUID GLASS DESIGN SYSTEM (Apple VisionOS / Fluent Acrylic)
+     ==================================================================== */
+
+  /* 1. Master Liquid Glass Card */
+  .clay-card,
+  .liquid-glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.62) 0%, rgba(245, 250, 255, 0.3) 100%);
+    backdrop-filter: blur(24px) saturate(190%) contrast(98%);
+    -webkit-backdrop-filter: blur(24px) saturate(190%) contrast(98%);
+    border: 1px solid rgba(255, 255, 255, 0.68);
+    box-shadow:
+      0 20px 40px -15px rgba(20, 35, 60, 0.12),
+      0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+      inset 0 1px 2px rgba(255, 255, 255, 0.95),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.03);
+    border-radius: 18px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .dark .clay-card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(20, 28, 43, 0.65) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 
-      10px 14px 28px rgba(0, 0, 0, 0.45),
-      -3px -3px 12px rgba(255, 255, 255, 0.03),
-      inset 1px 1px 1px rgba(255, 255, 255, 0.15);
+  .dark .clay-card,
+  .dark .liquid-glass {
+    background: linear-gradient(135deg, rgba(28, 40, 60, 0.62) 0%, rgba(14, 21, 35, 0.42) 100%);
+    backdrop-filter: blur(28px) saturate(200%) contrast(98%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%) contrast(98%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 24px 50px -12px rgba(0, 0, 0, 0.58),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+      inset 0 1px 1px rgba(255, 255, 255, 0.2),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+    border-radius: 18px;
   }
 
-  /* Deep Neumorphic Square Inset / Slot */
+  .clay-card:hover,
+  .liquid-glass:hover {
+    border-color: rgba(255, 255, 255, 0.85);
+    box-shadow:
+      0 24px 50px -12px rgba(20, 35, 60, 0.18),
+      0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+      inset 0 1px 3px rgba(255, 255, 255, 1);
+  }
+
+  .dark .clay-card:hover,
+  .dark .liquid-glass:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    box-shadow:
+      0 26px 60px -10px rgba(0, 0, 0, 0.72),
+      0 0 0 1px rgba(255, 255, 255, 0.16) inset,
+      inset 0 1px 2px rgba(255, 255, 255, 0.28);
+  }
+
+  /* 2. Liquid Glass Inset / Well */
   .neu-inset {
-    background: rgba(145, 165, 185, 0.22);
-    box-shadow: 
-      inset 3px 4px 7px rgba(25, 40, 65, 0.2),
-      inset -2px -3px 6px rgba(255, 255, 255, 0.75);
-    border-radius: 10px;
+    background: rgba(145, 168, 195, 0.16);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow:
+      inset 2px 3px 6px rgba(20, 35, 60, 0.12),
+      inset -1px -1px 2px rgba(255, 255, 255, 0.65);
+    border-radius: 12px;
   }
 
   .dark .neu-inset {
-    background: rgba(15, 23, 42, 0.6);
-    box-shadow: 
-      inset 3px 4px 7px rgba(0, 0, 0, 0.55),
-      inset -1px -1px 3px rgba(255, 255, 255, 0.06);
+    background: rgba(10, 16, 28, 0.5);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 2px 3px 6px rgba(0, 0, 0, 0.55),
+      inset -1px -1px 2px rgba(255, 255, 255, 0.05);
   }
 
-  /* Tactile Square Button */
+  /* 3. Liquid Glass Pill Button */
   .neu-pill-btn {
-    background: linear-gradient(145deg, #ffffff, #e6ecf3);
-    box-shadow: 
-      4px 6px 12px rgba(28, 45, 72, 0.15),
-      -2px -2px 6px rgba(255, 255, 255, 0.9),
-      inset 1px 1px 1px rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(240, 246, 253, 0.45) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow:
+      0 4px 14px rgba(20, 35, 60, 0.08),
+      inset 0 1px 1px rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .neu-pill-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 
-      6px 8px 16px rgba(28, 45, 72, 0.18),
-      -3px -3px 8px rgba(255, 255, 255, 0.95);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 250, 255, 0.65) 100%);
+    border-color: rgba(255, 255, 255, 0.95);
+    box-shadow:
+      0 8px 20px rgba(20, 35, 60, 0.12),
+      inset 0 1px 1px #ffffff;
   }
 
   .neu-pill-btn:active {
     transform: translateY(1px);
-    box-shadow: 
-      inset 3px 3px 5px rgba(25, 40, 65, 0.22),
-      inset -1px -1px 3px rgba(255, 255, 255, 0.6);
+    box-shadow:
+      inset 2px 2px 4px rgba(20, 35, 60, 0.15),
+      inset -1px -1px 2px rgba(255, 255, 255, 0.6);
   }
 
   .dark .neu-pill-btn {
-    background: linear-gradient(145deg, #2b3952, #1e283c);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 
-      4px 6px 12px rgba(0, 0, 0, 0.4),
-      -2px -2px 6px rgba(255, 255, 255, 0.03),
-      inset 1px 1px 1px rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, rgba(38, 52, 75, 0.72) 0%, rgba(22, 32, 48, 0.5) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow:
+      0 4px 14px rgba(0, 0, 0, 0.35),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2);
     color: #e2e8f0;
   }
 
   .dark .neu-pill-btn:hover {
-    box-shadow: 
-      6px 8px 16px rgba(0, 0, 0, 0.55),
-      -2px -2px 8px rgba(255, 255, 255, 0.05);
+    background: linear-gradient(135deg, rgba(48, 64, 92, 0.85) 0%, rgba(28, 40, 60, 0.65) 100%);
+    border-color: rgba(255, 255, 255, 0.28);
+    box-shadow:
+      0 8px 20px rgba(0, 0, 0, 0.5),
+      inset 0 1px 1px rgba(255, 255, 255, 0.3);
   }
 
   .dark .neu-pill-btn:active {
-    box-shadow: 
-      inset 3px 3px 5px rgba(0, 0, 0, 0.5),
-      inset -1px -1px 3px rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 2px 2px 4px rgba(0, 0, 0, 0.55),
+      inset -1px -1px 2px rgba(255, 255, 255, 0.08);
   }
 
-  /* Vibrant Teal Square Button */
+  /* 4. Liquid Teal Gemstone Button */
   .neu-teal-btn {
-    background: linear-gradient(135deg, #64BEBE 0%, #4FA3A3 100%);
-    box-shadow: 
-      0 6px 14px rgba(79, 163, 163, 0.4),
-      inset 1px 1px 2px rgba(255, 255, 255, 0.5),
-      inset -1px -1px 2px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(95, 179, 179, 0.92) 0%, rgba(68, 150, 150, 0.96) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow:
+      0 8px 24px -3px rgba(79, 163, 163, 0.48),
+      inset 0 1px 2px rgba(255, 255, 255, 0.75),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
     color: #ffffff;
-    font-weight: 600;
+    font-weight: 700;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .neu-teal-btn:hover {
     transform: translateY(-1px) scale(1.01);
-    box-shadow: 
-      0 10px 20px rgba(79, 163, 163, 0.5),
-      inset 1px 1px 2px rgba(255, 255, 255, 0.7);
+    background: linear-gradient(135deg, rgba(105, 192, 192, 0.98) 0%, rgba(75, 162, 162, 1) 100%);
+    box-shadow:
+      0 12px 28px -2px rgba(79, 163, 163, 0.65),
+      inset 0 1px 2px #ffffff;
   }
 
   .neu-teal-btn:active {
     transform: translateY(1px) scale(0.99);
-    box-shadow: 
-      inset 3px 3px 6px rgba(0, 0, 0, 0.25),
+    box-shadow:
+      inset 2px 2px 4px rgba(0, 0, 0, 0.25),
       inset -1px -1px 2px rgba(255, 255, 255, 0.3);
+  }
+
+  /* 5. Liquid Glass Floating Header */
+  .liquid-header {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.15) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .dark .liquid-header {
+    background: linear-gradient(180deg, rgba(20, 28, 44, 0.55) 0%, rgba(12, 18, 30, 0.35) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   /* Embossed Page Header Title */
   .embossed-title {
-    color: #2c3e55;
-    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8), -1px -1px 1px rgba(0, 0, 0, 0.1);
+    color: #1e293b;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
   }
 
   .dark .embossed-title {
-    color: #e2e8f0;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), -1px -1px 1px rgba(255, 255, 255, 0.05);
+    color: #f8fafc;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   }
 }

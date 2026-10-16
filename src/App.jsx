@@ -17,7 +17,7 @@ import TimerPage from './pages/TimerPage';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 
-import { LayoutDashboard, Clock, CalendarDays, Timer, BarChart3 } from 'lucide-react';
+import { Home, Compass, BarChart3, Timer, User } from 'lucide-react';
 import { useTaskStore } from './store/useTaskStore';
 
 export default function App() {
@@ -46,20 +46,28 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#9FB3C8] dark:bg-[#101827] text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-300">
+      <div className="relative min-h-screen bg-gradient-to-br from-[#dce7f2] via-[#eaf1f8] to-[#d8e5f2] dark:from-[#0b101c] dark:via-[#0e1627] dark:to-[#080d18] text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-500 overflow-x-hidden">
+        {/* Liquid Ambient Glowing Mesh Orbs (Fixed in background for realistic glass refraction) */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute -top-32 -left-32 w-96 h-96 sm:w-[540px] sm:h-[540px] rounded-full bg-brand-teal/20 dark:bg-brand-teal/15 blur-[120px] sm:blur-[150px] animate-pulse" />
+          <div className="absolute top-[20%] -right-32 w-96 h-96 sm:w-[600px] sm:h-[600px] rounded-full bg-brand-purple/20 dark:bg-brand-purple/15 blur-[130px] sm:blur-[160px]" />
+          <div className="absolute -bottom-32 left-[15%] w-96 h-96 sm:w-[500px] sm:h-[500px] rounded-full bg-brand-coral/15 dark:bg-brand-coral/10 blur-[120px] sm:blur-[140px]" />
+          <div className="absolute top-[65%] right-[20%] w-80 h-80 sm:w-[450px] sm:h-[450px] rounded-full bg-brand-mint/15 dark:bg-brand-mint/10 blur-[110px] sm:blur-[130px]" />
+        </div>
+
         {/* Mobile Backdrop Overlay */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 z-30 bg-slate-950/60 backdrop-blur-sm md:hidden animate-in fade-in"
+            className="fixed inset-0 z-30 bg-slate-950/60 backdrop-blur-md md:hidden animate-in fade-in"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
-        {/* 1. Left Sidebar */}
+        {/* 1. Left Sidebar (Liquid Glass) */}
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* 2. Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-screen min-h-[100dvh] pb-24 md:pb-6">
+        <div className="relative z-10 flex-1 flex flex-col min-w-0 min-h-screen min-h-[100dvh] pb-32 md:pb-6">
           {/* Top Bar */}
           <TopBar
             onOpenSidebar={() => setSidebarOpen(true)}
@@ -93,64 +101,128 @@ export default function App() {
           </main>
         </div>
 
-        {/* 3. Mobile Bottom Navigation Bar (Phone-friendly quick switches with safe area support) */}
-        <div className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-[#202D42]/95 backdrop-blur-md border-t border-slate-700/60 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom,0px))] px-3 flex items-center justify-around shadow-2xl">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-2 rounded-lg transition-colors ${
-                isActive ? 'text-brand-teal' : 'text-slate-400 hover:text-slate-200'
-              }`
-            }
+        {/* 3. Floating Curved Transparent Liquid Glass Bottom Navigation Bar */}
+        <div className="md:hidden fixed bottom-3 sm:bottom-4 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[440px] max-w-md mx-auto z-40 select-none">
+          <nav
+            aria-label="Mobile Navigation"
+            className="
+              relative
+              bg-white/30 dark:bg-[#070B19]/40 
+              backdrop-blur-2xl backdrop-saturate-[190%] 
+              border border-white/60 dark:border-white/20 
+              rounded-[28px] 
+              p-1.5 
+              flex items-center justify-between gap-1
+              shadow-[0_16px_36px_-6px_rgba(15,23,42,0.18),0_0_20px_-2px_rgba(139,92,246,0.25),inset_0_1.5px_2px_rgba(255,255,255,0.7),inset_0_-1px_2px_rgba(0,0,0,0.08)]
+              dark:shadow-[0_20px_50px_-10px_rgba(4,7,17,0.75),0_0_25px_-5px_rgba(37,99,235,0.35),inset_0_1px_1.5px_rgba(255,255,255,0.35),inset_0_-1px_2px_rgba(0,0,0,0.5)]
+            "
           >
-            <LayoutDashboard className="w-5 h-5" />
-            <span>Home</span>
-          </NavLink>
+            {/* 1. Home */}
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
+                  isActive
+                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <Home className={`w-5 h-5 transition-transform ${isActive ? 'stroke-[2.2] scale-105' : 'stroke-[1.9]'}`} />
+                  <span className={`text-[10px] tracking-tight mt-0.5 ${isActive ? 'font-bold text-white' : 'font-semibold text-slate-700 dark:text-slate-300'}`}>
+                    Home
+                  </span>
+                </>
+              )}
+            </NavLink>
 
-          <NavLink
-            to="/today"
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-2 rounded-lg transition-colors ${
-                isActive ? 'text-brand-teal' : 'text-slate-400 hover:text-slate-200'
-              }`
-            }
-          >
-            <Clock className="w-5 h-5" />
-            <span>Today</span>
-          </NavLink>
+            {/* 2. Explore / Today */}
+            <NavLink
+              to="/today"
+              className={({ isActive }) =>
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
+                  isActive
+                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <Compass className={`w-5 h-5 transition-transform ${isActive ? 'stroke-[2.2] scale-105' : 'stroke-[1.9]'}`} />
+                  <span className={`text-[10px] tracking-tight mt-0.5 ${isActive ? 'font-bold text-white' : 'font-semibold text-slate-700 dark:text-slate-300'}`}>
+                    Explore
+                  </span>
+                </>
+              )}
+            </NavLink>
 
-          <button
-            onClick={handleOpenNewTask}
-            className="w-12 h-12 -mt-6 rounded-full neu-teal-btn flex items-center justify-center shadow-2xl text-white active:scale-90 transition-all border-2 border-slate-900"
-            title="Create Task"
-            aria-label="Create New Task"
-          >
-            <span className="text-2xl font-bold leading-none mb-0.5">+</span>
-          </button>
+            {/* 3. Study Analytics */}
+            <NavLink
+              to="/analytics"
+              className={({ isActive }) =>
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
+                  isActive
+                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                }`
+              }
+              title="Study Analytics"
+            >
+              {({ isActive }) => (
+                <>
+                  <BarChart3 className={`w-5 h-5 transition-transform ${isActive ? 'stroke-[2.2] scale-105' : 'stroke-[1.9]'}`} />
+                  <span className={`text-[10px] tracking-tight mt-0.5 truncate max-w-full text-center ${isActive ? 'font-bold text-white' : 'font-semibold text-slate-700 dark:text-slate-300'}`}>
+                    Analytics
+                  </span>
+                </>
+              )}
+            </NavLink>
 
-          <NavLink
-            to="/timer"
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-2 rounded-lg transition-colors ${
-                isActive ? 'text-brand-teal' : 'text-slate-400 hover:text-slate-200'
-              }`
-            }
-          >
-            <Timer className="w-5 h-5" />
-            <span>Timer</span>
-          </NavLink>
+            {/* 4. Timer */}
+            <NavLink
+              to="/timer"
+              className={({ isActive }) =>
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
+                  isActive
+                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <Timer className={`w-5 h-5 transition-transform ${isActive ? 'stroke-[2.2] scale-105' : 'stroke-[1.9]'}`} />
+                  <span className={`text-[10px] tracking-tight mt-0.5 ${isActive ? 'font-bold text-white' : 'font-semibold text-slate-700 dark:text-slate-300'}`}>
+                    Timer
+                  </span>
+                </>
+              )}
+            </NavLink>
 
-          <NavLink
-            to="/analytics"
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-2 rounded-lg transition-colors ${
-                isActive ? 'text-brand-teal' : 'text-slate-400 hover:text-slate-200'
-              }`
-            }
-          >
-            <BarChart3 className="w-5 h-5" />
-            <span>Stats</span>
-          </NavLink>
+            {/* 5. Profile / Settings */}
+            <NavLink
+              to="/settings"
+              className={({ isActive }) =>
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
+                  isActive
+                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <User className={`w-5 h-5 transition-transform ${isActive ? 'stroke-[2.2] scale-105' : 'stroke-[1.9]'}`} />
+                  <span className={`text-[10px] tracking-tight mt-0.5 ${isActive ? 'font-bold text-white' : 'font-semibold text-slate-700 dark:text-slate-300'}`}>
+                    Profile
+                  </span>
+                </>
+              )}
+            </NavLink>
+          </nav>
         </div>
 
         {/* 4. Global Task Modal */}

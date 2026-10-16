@@ -45,17 +45,17 @@ export default function HeroBanner() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl clay-card p-4 sm:p-6 shadow-neu-card border border-white/60 dark:border-slate-700/60 transition-all">
+    <div className="relative overflow-hidden rounded-2xl clay-card p-3.5 sm:p-6 shadow-neu-card border border-white/60 dark:border-slate-700/60 transition-all">
       {/* Background soft ambient gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-slate-900/10 via-transparent to-brand-blue/10 pointer-events-none" />
 
-      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
         {/* Left: 3D Character Shelf Illustration matching the screenshot */}
         <div className="relative w-full md:w-5/12 max-w-sm rounded-xl overflow-hidden shadow-md group">
           <img
             src="/assets/student_shelf_hero.jpg"
             alt="Student studying with headphones"
-            className="w-full h-44 sm:h-52 object-cover rounded-xl group-hover:scale-105 transition-transform duration-500 ease-out"
+            className="w-full h-36 xs:h-44 sm:h-52 object-cover rounded-xl group-hover:scale-105 transition-transform duration-500 ease-out"
           />
           <div className="absolute top-2.5 left-2.5 bg-slate-950/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1 shadow">
             <Sparkles className="w-3 h-3 text-brand-teal" />
@@ -64,7 +64,7 @@ export default function HeroBanner() {
         </div>
 
         {/* Right: Content details */}
-        <div className="flex-1 w-full text-center md:text-left space-y-3">
+        <div className="flex-1 w-full text-center md:text-left space-y-2.5 sm:space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-brand-teal/15 text-brand-teal text-xs font-bold border border-brand-teal/30">
             <Flame className="w-3.5 h-3.5 fill-current text-amber-500" />
             <span>
@@ -72,11 +72,11 @@ export default function HeroBanner() {
             </span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">
             {getGreeting()}, {userName}!
           </h2>
 
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto md:mx-0 leading-relaxed">
             {nextTask ? (
               <>
                 Next up: <span className="font-bold text-brand-teal">{nextTask.title}</span> ({nextTask.duration}m). Ready to enter deep work?
@@ -86,10 +86,10 @@ export default function HeroBanner() {
             )}
           </p>
 
-          <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-3">
+          <div className="pt-2 flex flex-col xs:flex-row items-center justify-center md:justify-start gap-2.5 sm:gap-3">
             <button
               onClick={handleStartStudying}
-              className="neu-teal-btn flex items-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-bold shadow-lg"
+              className="neu-teal-btn flex items-center justify-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-bold shadow-lg w-full xs:w-auto"
             >
               <Play className="w-4 h-4 fill-current" />
               <span>Start Studying</span>
@@ -97,7 +97,7 @@ export default function HeroBanner() {
 
             <button
               onClick={() => navigate('/today')}
-              className="neu-pill-btn flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200"
+              className="neu-pill-btn flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 w-full xs:w-auto"
             >
               <Clock className="w-4 h-4 text-brand-blue" />
               <span>View Timeline</span>

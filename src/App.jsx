@@ -59,7 +59,7 @@ export default function App() {
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* 2. Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-screen pb-20 md:pb-6">
+        <div className="flex-1 flex flex-col min-w-0 min-h-screen min-h-[100dvh] pb-24 md:pb-6">
           {/* Top Bar */}
           <TopBar
             onOpenSidebar={() => setSidebarOpen(true)}
@@ -67,7 +67,7 @@ export default function App() {
           />
 
           {/* Route Content View */}
-          <main className="flex-1 px-4 lg:px-8 py-3 max-w-7xl w-full mx-auto">
+          <main className="flex-1 px-3 sm:px-4 lg:px-8 py-3 max-w-7xl w-full mx-auto">
             <Routes>
               <Route path="/" element={<Dashboard onOpenNewTask={handleOpenNewTask} />} />
               <Route
@@ -93,13 +93,13 @@ export default function App() {
           </main>
         </div>
 
-        {/* 3. Mobile Bottom Navigation Bar (Phone-friendly quick switches) */}
-        <div className="md:hidden fixed bottom-0 inset-x-0 z-20 bg-[#202D42]/95 backdrop-blur-md border-t border-slate-700/60 py-2 px-4 flex items-center justify-around shadow-2xl">
+        {/* 3. Mobile Bottom Navigation Bar (Phone-friendly quick switches with safe area support) */}
+        <div className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-[#202D42]/95 backdrop-blur-md border-t border-slate-700/60 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom,0px))] px-3 flex items-center justify-around shadow-2xl">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 text-[10px] font-bold ${
-                isActive ? 'text-brand-teal' : 'text-slate-400'
+              `flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-2 rounded-lg transition-colors ${
+                isActive ? 'text-brand-teal' : 'text-slate-400 hover:text-slate-200'
               }`
             }
           >
@@ -110,8 +110,8 @@ export default function App() {
           <NavLink
             to="/today"
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 text-[10px] font-bold ${
-                isActive ? 'text-brand-teal' : 'text-slate-400'
+              `flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-2 rounded-lg transition-colors ${
+                isActive ? 'text-brand-teal' : 'text-slate-400 hover:text-slate-200'
               }`
             }
           >
@@ -121,17 +121,18 @@ export default function App() {
 
           <button
             onClick={handleOpenNewTask}
-            className="w-12 h-12 -mt-5 rounded-full neu-teal-btn flex items-center justify-center shadow-2xl text-white active:scale-95 transition-all"
+            className="w-12 h-12 -mt-6 rounded-full neu-teal-btn flex items-center justify-center shadow-2xl text-white active:scale-90 transition-all border-2 border-slate-900"
             title="Create Task"
+            aria-label="Create New Task"
           >
-            <span className="text-xl font-bold leading-none">+</span>
+            <span className="text-2xl font-bold leading-none mb-0.5">+</span>
           </button>
 
           <NavLink
             to="/timer"
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 text-[10px] font-bold ${
-                isActive ? 'text-brand-teal' : 'text-slate-400'
+              `flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-2 rounded-lg transition-colors ${
+                isActive ? 'text-brand-teal' : 'text-slate-400 hover:text-slate-200'
               }`
             }
           >
@@ -142,8 +143,8 @@ export default function App() {
           <NavLink
             to="/analytics"
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 text-[10px] font-bold ${
-                isActive ? 'text-brand-teal' : 'text-slate-400'
+              `flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-2 rounded-lg transition-colors ${
+                isActive ? 'text-brand-teal' : 'text-slate-400 hover:text-slate-200'
               }`
             }
           >

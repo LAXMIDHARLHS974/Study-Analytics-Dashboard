@@ -217,8 +217,8 @@ export default function Subjects() {
 
       {/* Add Subject Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md clay-card p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md clay-card p-4 sm:p-6 shadow-2xl max-h-[90dvh] overflow-y-auto">
             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">
               Add New Subject
             </h3>

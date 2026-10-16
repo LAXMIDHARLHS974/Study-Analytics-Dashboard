@@ -72,13 +72,13 @@ export default function YearPlan() {
         </div>
 
         {/* Big Year Stats (Square-type insets) */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="text-center p-3 rounded-xl neu-inset min-w-[90px]">
+        <div className="flex items-center justify-center gap-3 w-full md:w-auto shrink-0">
+          <div className="text-center p-3 rounded-xl neu-inset min-w-[90px] flex-1 sm:flex-none">
             <span className="text-xl font-black text-brand-teal">{completedMonths}/12</span>
             <span className="block text-[10px] text-slate-500 font-bold uppercase mt-0.5">Months Done</span>
           </div>
 
-          <div className="text-center p-3 rounded-xl neu-inset min-w-[100px]">
+          <div className="text-center p-3 rounded-xl neu-inset min-w-[100px] flex-1 sm:flex-none">
             <span className="text-xl font-black text-brand-blue">{totalLoggedHours}h</span>
             <span className="block text-[10px] text-slate-500 font-bold uppercase mt-0.5">Total Hours</span>
           </div>
@@ -167,8 +167,8 @@ export default function YearPlan() {
 
       {/* Edit Month Plan Modal */}
       {editingMonth && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md clay-card p-6 shadow-2xl space-y-4 rounded-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md clay-card p-4 sm:p-6 shadow-2xl space-y-4 rounded-xl max-h-[90dvh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-300/40 dark:border-slate-700/60">
               <div>
                 <h3 className="text-base font-bold text-slate-800 dark:text-white">

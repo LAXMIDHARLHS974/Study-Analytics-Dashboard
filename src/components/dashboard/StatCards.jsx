@@ -68,14 +68,14 @@ export default function StatCards() {
         return (
           <div
             key={stat.id}
-            className="clay-card p-4 sm:p-5 flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group"
+            className="clay-card p-3 sm:p-5 flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group"
           >
             {/* Top Icon Squircle */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
               <div
-                className={`w-11 h-11 rounded-xl ${stat.iconBg} ${stat.iconColor} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200 border border-white/30`}
+                className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl ${stat.iconBg} ${stat.iconColor} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200 border border-white/30`}
               >
-                <Icon className="w-5 h-5 fill-current/20 stroke-[2.2]" />
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5 fill-current/20 stroke-[2.2]" />
               </div>
 
               <div className="flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
@@ -86,22 +86,22 @@ export default function StatCards() {
 
             {/* Stat Title */}
             <div>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
                 {stat.title}
               </p>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">
+                <span className="text-xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">
                   {stat.value}
                 </span>
                 {stat.unit && (
-                  <span className="text-xs font-bold text-slate-500">{stat.unit}</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-500">{stat.unit}</span>
                 )}
               </div>
             </div>
 
             {/* Bottom Change Subtext */}
-            <div className="mt-3 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md inline-block ${stat.badgeColor}`}>
+            <div className="mt-2 sm:mt-3 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
+              <span className={`text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md inline-block truncate max-w-full ${stat.badgeColor}`}>
                 {stat.subtext}
               </span>
             </div>

@@ -61,14 +61,14 @@ export default function Today({ onOpenNewTask, onEditTask }) {
   const handleSetTomorrow = () => setSelectedDate(addDays(new Date(), 1));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Top Controls Card */}
-      <div className="clay-card p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="clay-card p-3 sm:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
         {/* Left: Quick Date Presets */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
           <button
             onClick={handleSetToday}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+            className={`px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
               isToday
                 ? 'neu-teal-btn text-white'
                 : 'neu-pill-btn text-slate-700 dark:text-slate-300'
@@ -78,7 +78,7 @@ export default function Today({ onOpenNewTask, onEditTask }) {
           </button>
           <button
             onClick={handleSetTomorrow}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+            className={`px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
               isTomorrow
                 ? 'neu-teal-btn text-white'
                 : 'neu-pill-btn text-slate-700 dark:text-slate-300'
@@ -89,33 +89,36 @@ export default function Today({ onOpenNewTask, onEditTask }) {
         </div>
 
         {/* Center: Date Navigator */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center gap-2 sm:gap-3">
           <button
             onClick={handlePrevDay}
-            className="p-2 rounded-full neu-pill-btn text-slate-600 dark:text-slate-300 hover:text-slate-900"
+            aria-label="Previous Day"
+            className="p-1.5 sm:p-2 rounded-full neu-pill-btn text-slate-600 dark:text-slate-300 hover:text-slate-900"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
 
-          <span className="text-sm font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-brand-teal" />
-            {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+          <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-white flex items-center gap-1.5 sm:gap-2 text-center">
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-teal shrink-0" />
+            <span className="sm:hidden">{format(selectedDate, 'EEE, MMM d, yyyy')}</span>
+            <span className="hidden sm:inline">{format(selectedDate, 'EEEE, MMMM d, yyyy')}</span>
           </span>
 
           <button
             onClick={handleNextDay}
-            className="p-2 rounded-full neu-pill-btn text-slate-600 dark:text-slate-300 hover:text-slate-900"
+            aria-label="Next Day"
+            className="p-1.5 sm:p-2 rounded-full neu-pill-btn text-slate-600 dark:text-slate-300 hover:text-slate-900"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
         {/* Right: Subject Filter & Add Task */}
-        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+        <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
           <select
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
-            className="px-3 py-1.5 text-xs font-semibold rounded-full neu-inset border border-white/60 dark:border-slate-700 text-slate-700 dark:text-slate-200"
+            className="px-3 py-1.5 text-xs font-semibold rounded-full neu-inset border border-white/60 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex-1 md:flex-none"
           >
             <option value="all">All Subjects</option>
             {subjects.map((s) => (
@@ -127,7 +130,7 @@ export default function Today({ onOpenNewTask, onEditTask }) {
 
           <button
             onClick={onOpenNewTask}
-            className="neu-teal-btn flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold shadow"
+            className="neu-teal-btn flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold shadow shrink-0"
           >
             <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Add Slot</span>
@@ -137,23 +140,23 @@ export default function Today({ onOpenNewTask, onEditTask }) {
 
       {/* Overdue alert if any */}
       {isToday && overdueTasks.length > 0 && (
-        <div className="clay-card p-4 bg-brand-coral/10 border border-brand-coral/30 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-brand-coral/20 text-brand-coral flex items-center justify-center shrink-0">
-              <AlertCircle className="w-5 h-5" />
+        <div className="clay-card p-3 sm:p-4 bg-brand-coral/10 border border-brand-coral/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-brand-coral/20 text-brand-coral flex items-center justify-center shrink-0">
+              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
               <h4 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white">
                 {overdueTasks.length} pending task{overdueTasks.length > 1 ? 's' : ''} from previous days
               </h4>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[10px] sm:text-[11px] text-slate-500">
                 Keep your streak going by carrying them forward.
               </p>
             </div>
           </div>
           <button
             onClick={() => carryForwardOverdueTasks(selectedDateStr)}
-            className="neu-pill-btn px-4 py-2 text-xs font-bold text-brand-coral hover:bg-brand-coral hover:text-white flex items-center gap-1.5 shrink-0"
+            className="neu-pill-btn px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-bold text-brand-coral hover:bg-brand-coral hover:text-white flex items-center justify-center gap-1.5 w-full sm:w-auto shrink-0"
           >
             <span>Move to {isToday ? 'Today' : 'This Date'}</span>
             <ArrowRight className="w-3.5 h-3.5" />

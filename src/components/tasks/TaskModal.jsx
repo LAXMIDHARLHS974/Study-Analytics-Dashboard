@@ -83,9 +83,9 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-lg clay-card p-6 shadow-2xl border border-white/60 dark:border-slate-700 max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg clay-card p-4 sm:p-6 shadow-2xl border border-white/60 dark:border-slate-700 max-h-[90vh] max-h-[90dvh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

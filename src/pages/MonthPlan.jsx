@@ -82,16 +82,19 @@ export default function MonthPlan({ onOpenNewTask, onEditTask }) {
       </div>
 
       {/* Calendar Grid */}
-      <div className="clay-card p-4 sm:p-6 shadow-neu-card">
+      <div className="clay-card p-2.5 sm:p-6 shadow-neu-card">
         {/* Day of Week Headers */}
-        <div className="grid grid-cols-7 gap-2 pb-3 mb-2 border-b border-slate-300/40 dark:border-slate-700/60 text-center text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 pb-2 sm:pb-3 mb-2 border-b border-slate-300/40 dark:border-slate-700/60 text-center text-[10px] sm:text-xs font-extrabold text-slate-500 uppercase tracking-wider">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-            <div key={d}>{d}</div>
+            <div key={d}>
+              <span className="sm:hidden">{d[0]}</span>
+              <span className="hidden sm:inline">{d}</span>
+            </div>
           ))}
         </div>
 
         {/* Days Grid */}
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {calendarDays.map((day) => {
             const dateStr = format(day, 'yyyy-MM-dd');
             const isCurrentMonth = isSameMonth(day, monthStart);
@@ -103,7 +106,7 @@ export default function MonthPlan({ onOpenNewTask, onEditTask }) {
               <div
                 key={dateStr}
                 onClick={() => handleDayClick(day)}
-                className={`min-h-[85px] sm:min-h-[100px] p-2 rounded-2xl cursor-pointer transition-all border flex flex-col justify-between ${
+                className={`min-h-[52px] xs:min-h-[64px] sm:min-h-[90px] md:min-h-[105px] p-1 sm:p-2 rounded-xl sm:rounded-2xl cursor-pointer transition-all border flex flex-col justify-between ${
                   !isCurrentMonth
                     ? 'opacity-30 border-transparent bg-slate-200/20 dark:bg-slate-900/10'
                     : isToday
@@ -116,7 +119,7 @@ export default function MonthPlan({ onOpenNewTask, onEditTask }) {
                 {/* Day Header */}
                 <div className="flex items-center justify-between">
                   <span
-                    className={`text-xs font-bold ${
+                    className={`text-[11px] sm:text-xs font-bold ${
                       isToday
                         ? 'text-brand-teal font-extrabold'
                         : 'text-slate-700 dark:text-slate-300'
@@ -125,28 +128,28 @@ export default function MonthPlan({ onOpenNewTask, onEditTask }) {
                     {format(day, 'd')}
                   </span>
                   {dayTasks.length > 0 && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                    <span className="text-[9px] sm:text-[10px] font-bold px-1 sm:px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                       {dayTasks.length}
                     </span>
                   )}
                 </div>
 
                 {/* Task Dots */}
-                <div className="flex flex-wrap gap-1 mt-1">
+                <div className="flex flex-wrap gap-0.5 sm:gap-1 mt-1">
                   {dayTasks.slice(0, 4).map((task) => {
                     const subj = subjects.find((s) => s.name === task.subject);
                     const color = subj ? subj.color : '#5FB3B3';
                     return (
                       <span
                         key={task.id}
-                        className="w-2 h-2 rounded-full shadow-sm"
+                        className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shadow-sm"
                         style={{ backgroundColor: color }}
                         title={`${task.title} (${task.subject})`}
                       />
                     );
                   })}
                   {dayTasks.length > 4 && (
-                    <span className="text-[9px] font-bold text-slate-500">
+                    <span className="text-[8px] sm:text-[9px] font-bold text-slate-500">
                       +{dayTasks.length - 4}
                     </span>
                   )}
@@ -159,8 +162,8 @@ export default function MonthPlan({ onOpenNewTask, onEditTask }) {
 
       {/* Day Details Modal */}
       {isDayModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg clay-card p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-lg clay-card p-4 sm:p-6 shadow-2xl max-h-[88dvh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-300/40 dark:border-slate-700/60">
               <div>
                 <h3 className="text-base font-bold text-slate-800 dark:text-white">

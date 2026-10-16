@@ -14,7 +14,8 @@ import {
   Crown,
   Layers,
   Flame,
-  ListTodo
+  ListTodo,
+  X
 } from 'lucide-react';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useTaskStore } from '../../store/useTaskStore';
@@ -28,13 +29,13 @@ const navItems = [
   { path: '/routine', label: 'Daily Routine', icon: Layers },
   { path: '/subjects', label: 'Subjects', icon: BookMarked },
   { path: '/goals', label: 'Goals', icon: Target },
-  { path: '/timer', label: 'Study Timer', icon: Timer },
-  { path: '/analytics', label: 'Analytics', icon: BarChart3 },
-  { path: '/settings', label: 'Settings', icon: Settings },
+  { path: '/timer', label: 'Study Timer', icon: Timer, hideOnMobile: true },
+  { path: '/analytics', label: 'Analytics', icon: BarChart3, hideOnMobile: true },
+  { path: '/settings', label: 'Settings', icon: Settings, hideOnMobile: true },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
-  const { userName, userAvatar } = useSettingsStore();
+  const { userName, userAvatar, userMotto } = useSettingsStore();
   const { tasks } = useTaskStore();
 
   const pendingCount = tasks.filter((t) => t.status !== 'Done').length;
@@ -46,11 +47,21 @@ export default function Sidebar({ isOpen, onClose }) {
         flex flex-col justify-between p-4 shadow-2xl transition-transform duration-300 ease-in-out
         md:translate-x-0 md:static md:w-64 lg:w-72 md:rounded-r-2xl md:my-3 md:ml-3
         border-r border-slate-700/40 select-none
+        pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1rem,env(safe-area-inset-bottom,0px))]
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}
     >
       {/* Top Profile Section */}
-      <div className="flex flex-col items-center pt-2 pb-4 border-b border-slate-700/50">
+      <div className="relative flex flex-col items-center pt-2 pb-4 border-b border-slate-700/50">
+        {/* Mobile close button */}
+        <button
+          onClick={onClose}
+          aria-label="Close menu"
+          className="md:hidden absolute top-0 right-0 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         <div className="relative group cursor-pointer">
           <div className="w-20 h-20 rounded-2xl p-1 bg-gradient-to-tr from-brand-teal/80 via-brand-blue/60 to-brand-purple/80 shadow-lg">
             <img
@@ -65,7 +76,9 @@ export default function Sidebar({ isOpen, onClose }) {
           <span>Hi, {userName}!</span>
           <span className="text-brand-teal text-sm">✨</span>
         </h2>
-        <p className="text-xs text-slate-400 font-medium">Fuck Your Emotions</p>
+        <p className="text-xs text-slate-400 font-medium truncate max-w-[220px]">
+          {userMotto || 'Stay Focused & Consistent'}
+        </p>
       </div>
 
       {/* Navigation List with Neumorphic Active States */}
@@ -78,7 +91,7 @@ export default function Sidebar({ isOpen, onClose }) {
               to={item.path}
               onClick={() => onClose && onClose()}
               className={({ isActive }) => `
-                flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-200
+                ${item.hideOnMobile ? 'hidden md:flex' : 'flex'} items-center gap-3.5 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-200
                 ${isActive
                   ? 'bg-gradient-to-r from-[#2F3F5B] to-[#394B6B] text-white shadow-sidebar-nav border-t border-slate-500/30 text-white font-bold'
                   : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/40'
@@ -108,8 +121,8 @@ export default function Sidebar({ isOpen, onClose }) {
         })}
       </nav>
 
-      {/* Bottom Pro Card (Matching Screenshot "Go Premium" Look) */}
-      <div className="pt-2">
+      {/* Bottom Pro Card (Matching Screenshot "Go Premium" Look) - hidden on mobile drawer */}
+      <div className="pt-2 hidden md:block">
         <div className="rounded-2xl p-3.5 bg-gradient-to-b from-[#28374F] to-[#1C2739] border border-slate-700/60 shadow-lg relative overflow-hidden group">
           <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-brand-teal/10 rounded-full blur-xl group-hover:bg-brand-teal/20 transition-all"></div>
           <div className="flex items-center gap-2 mb-1.5">

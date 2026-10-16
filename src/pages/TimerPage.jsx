@@ -170,12 +170,12 @@ export default function TimerPage() {
       </div>
 
       {/* Main Timer Dial Card */}
-      <div className="clay-card p-8 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl">
+      <div className="clay-card p-4 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl">
         {/* Mode Selector Tabs */}
-        <div className="flex items-center gap-2 p-1.5 rounded-full neu-inset mb-8">
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-1 sm:gap-2 p-1 sm:p-1.5 rounded-2xl sm:rounded-full neu-inset mb-6 sm:mb-8 max-w-full">
           <button
             onClick={() => switchMode('work')}
-            className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl sm:rounded-full text-[11px] sm:text-xs font-bold transition-all ${
               timerMode === 'work'
                 ? 'neu-teal-btn shadow-md'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
@@ -185,7 +185,7 @@ export default function TimerPage() {
           </button>
           <button
             onClick={() => switchMode('shortBreak')}
-            className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl sm:rounded-full text-[11px] sm:text-xs font-bold transition-all ${
               timerMode === 'shortBreak'
                 ? 'bg-brand-blue text-white shadow-md'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
@@ -195,7 +195,7 @@ export default function TimerPage() {
           </button>
           <button
             onClick={() => switchMode('longBreak')}
-            className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl sm:rounded-full text-[11px] sm:text-xs font-bold transition-all ${
               timerMode === 'longBreak'
                 ? 'bg-brand-purple text-white shadow-md'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
@@ -206,7 +206,7 @@ export default function TimerPage() {
         </div>
 
         {/* Circular Progress & Clock */}
-        <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center">
+        <div className="relative w-52 h-52 sm:w-72 sm:h-72 flex items-center justify-center">
           <svg className="w-full h-full transform -rotate-90">
             {/* Background ring */}
             <circle
@@ -214,7 +214,7 @@ export default function TimerPage() {
               cy="50%"
               r="44%"
               className="stroke-slate-200/80 dark:stroke-slate-800"
-              strokeWidth="12"
+              strokeWidth="10"
               fill="transparent"
             />
             {/* Progress animated ring */}
@@ -223,7 +223,7 @@ export default function TimerPage() {
               cy="50%"
               r="44%"
               stroke={timerMode === 'work' ? '#5FB3B3' : timerMode === 'shortBreak' ? '#6A9AC4' : '#7B7FBF'}
-              strokeWidth="12"
+              strokeWidth="10"
               strokeDasharray="276"
               strokeDashoffset={276 - (276 * progressPct) / 100}
               strokeLinecap="round"
@@ -235,28 +235,28 @@ export default function TimerPage() {
 
           {/* Center Digital Clock */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-5xl sm:text-6xl font-black text-slate-800 dark:text-white tracking-tight font-mono">
+            <span className="text-4xl sm:text-6xl font-black text-slate-800 dark:text-white tracking-tight font-mono">
               {timeFormatted}
             </span>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-2">
+            <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1 sm:mt-2">
               {timerMode === 'work' ? activeSubject : 'Break Time'}
             </span>
           </div>
         </div>
 
         {/* Controls: Play/Pause, Reset, Skip */}
-        <div className="flex items-center gap-4 mt-8">
+        <div className="flex items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
           <button
             onClick={resetTimer}
-            className="p-3.5 rounded-full neu-pill-btn text-slate-600 dark:text-slate-300 hover:text-slate-900 active:scale-95 transition-all shadow"
+            className="p-3 sm:p-3.5 rounded-full neu-pill-btn text-slate-600 dark:text-slate-300 hover:text-slate-900 active:scale-95 transition-all shadow"
             title="Reset Timer"
           >
-            <RotateCcw className="w-5 h-5" />
+            <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           <button
             onClick={toggleTimer}
-            className={`px-8 py-3.5 rounded-full flex items-center gap-2 text-base font-bold shadow-xl transition-all active:scale-95 ${
+            className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-full flex items-center gap-2 text-sm sm:text-base font-bold shadow-xl transition-all active:scale-95 ${
               isTimerRunning
                 ? 'bg-amber-500 text-white hover:bg-amber-600'
                 : 'neu-teal-btn'
@@ -264,12 +264,12 @@ export default function TimerPage() {
           >
             {isTimerRunning ? (
               <>
-                <Pause className="w-5 h-5 fill-current" />
+                <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
                 <span>Pause</span>
               </>
             ) : (
               <>
-                <Play className="w-5 h-5 fill-current" />
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
                 <span>Start Focus</span>
               </>
             )}
@@ -277,10 +277,10 @@ export default function TimerPage() {
 
           <button
             onClick={handleSessionComplete}
-            className="p-3.5 rounded-full neu-pill-btn text-slate-600 dark:text-slate-300 hover:text-slate-900 active:scale-95 transition-all shadow"
+            className="p-3 sm:p-3.5 rounded-full neu-pill-btn text-slate-600 dark:text-slate-300 hover:text-slate-900 active:scale-95 transition-all shadow"
             title="Complete / Skip"
           >
-            <SkipForward className="w-5 h-5" />
+            <SkipForward className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 

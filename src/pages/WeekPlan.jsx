@@ -91,7 +91,7 @@ export default function WeekPlan({ onOpenNewTask, onEditTask }) {
       </div>
 
       {/* 7-Day Columns Grid (Square Boxes) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
         {weekDays.map((day) => {
           const dateStr = format(day, 'yyyy-MM-dd');
           const isToday = isSameDay(day, new Date());
@@ -102,7 +102,7 @@ export default function WeekPlan({ onOpenNewTask, onEditTask }) {
           return (
             <div
               key={dateStr}
-              className={`clay-card p-3 rounded-xl flex flex-col justify-between min-h-[400px] transition-all ${
+              className={`clay-card p-3 rounded-xl flex flex-col justify-between min-h-[160px] md:min-h-[400px] transition-all ${
                 isToday ? 'ring-2 ring-brand-teal shadow-lg' : ''
               }`}
             >
@@ -158,7 +158,7 @@ export default function WeekPlan({ onOpenNewTask, onEditTask }) {
                   ))}
 
                   {dayTasks.length === 0 && (
-                    <div className="py-8 text-center">
+                    <div className="py-4 md:py-8 text-center">
                       <span className="text-[11px] text-slate-400 font-medium">
                         No tasks planned
                       </span>

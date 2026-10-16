@@ -243,10 +243,10 @@ export default function DailyRoutine() {
             </div>
 
             {/* Quick Apply & Add Block Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => openBlockModal(null)}
-                className="neu-teal-btn px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 shadow"
+                className="neu-teal-btn px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow flex-1 sm:flex-none"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Block</span>
@@ -254,7 +254,7 @@ export default function DailyRoutine() {
 
               <button
                 onClick={() => handleApply(format(new Date(), 'yyyy-MM-dd'), 'Today')}
-                className="neu-pill-btn px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"
+                className="neu-pill-btn px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
               >
                 <Calendar className="w-3.5 h-3.5 text-brand-teal" />
                 <span>Apply to Today</span>
@@ -264,7 +264,7 @@ export default function DailyRoutine() {
                 onClick={() =>
                   handleApply(format(addDays(new Date(), 1), 'yyyy-MM-dd'), 'Tomorrow')
                 }
-                className="neu-pill-btn px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"
+                className="neu-pill-btn px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 w-full sm:w-auto"
               >
                 <Calendar className="w-3.5 h-3.5 text-brand-blue" />
                 <span>Apply to Tomorrow</span>
@@ -367,8 +367,8 @@ export default function DailyRoutine() {
 
       {/* Routine Template Edit/Create Modal */}
       {isTemplateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md clay-card p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md clay-card p-4 sm:p-6 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-300/40 dark:border-slate-700/60">
               <h3 className="text-base font-bold text-slate-800 dark:text-white">
                 {editingTemplate ? 'Edit Routine Template' : 'Create Routine Template'}
@@ -444,8 +444,8 @@ export default function DailyRoutine() {
 
       {/* Routine Block Edit/Create Modal */}
       {isBlockModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md clay-card p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md clay-card p-4 sm:p-6 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-300/40 dark:border-slate-700/60">
               <h3 className="text-base font-bold text-slate-800 dark:text-white">
                 {editingBlock ? 'Edit Routine Block' : 'Add Routine Block'}

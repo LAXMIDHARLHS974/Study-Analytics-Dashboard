@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Play, Sparkles, Flame, Clock, BookOpen } from 'lucide-react';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useTaskStore } from '../../store/useTaskStore';
+import { calculateStreak } from '../../utils/studyStats';
 
 export default function HeroBanner() {
   const navigate = useNavigate();
   const { userName, setTimerState } = useSettingsStore();
-  const { tasks } = useTaskStore();
+  const { tasks, timerLogs } = useTaskStore();
+
+  const { currentStreak, studiedToday } = calculateStreak(timerLogs, tasks);
 
   // Dynamic greeting based on current time
   const getGreeting = () => {
@@ -26,6 +29,14 @@ export default function HeroBanner() {
         activeTaskId: nextTask.id,
         activeSubject: nextTask.subject,
         timerSecondsLeft: (nextTask.duration || 25) * 60,
+        isTimerRunning: true,
+        timerMode: 'work',
+      });
+    } else {
+      setTimerState({
+        activeTaskId: null,
+        activeSubject: 'General Study',
+        timerSecondsLeft: 25 * 60,
         isTimerRunning: true,
         timerMode: 'work',
       });
@@ -56,7 +67,9 @@ export default function HeroBanner() {
         <div className="flex-1 w-full text-center md:text-left space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-brand-teal/15 text-brand-teal text-xs font-bold border border-brand-teal/30">
             <Flame className="w-3.5 h-3.5 fill-current text-amber-500" />
-            <span>7-Day Study Streak Active 🔥</span>
+            <span>
+              {currentStreak}-Day Study Streak {studiedToday ? 'Active 🔥' : currentStreak > 0 ? 'On Track ⚡' : 'Start Today ✨'}
+            </span>
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">
@@ -69,7 +82,7 @@ export default function HeroBanner() {
                 Next up: <span className="font-bold text-brand-teal">{nextTask.title}</span> ({nextTask.duration}m). Ready to enter deep work?
               </>
             ) : (
-              'All tasks completed for today! Time to review your notes or take a restful break.'
+              'Ready to build high focus? Add your subjects and tasks or start a study sprint!'
             )}
           </p>
 

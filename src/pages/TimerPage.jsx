@@ -303,17 +303,27 @@ export default function TimerPage() {
 
           <div>
             <label className="block text-xs font-semibold text-slate-500 mb-1">Subject</label>
-            <select
-              value={activeSubject}
-              onChange={(e) => setTimerState({ activeSubject: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl neu-inset text-xs font-bold text-slate-800 dark:text-white border border-white/60 dark:border-slate-700"
-            >
-              {subjects.map((s) => (
-                <option key={s.id} value={s.name} className="bg-slate-800 text-white">
-                  {s.name}
-                </option>
-              ))}
-            </select>
+            {subjects.length > 0 ? (
+              <select
+                value={activeSubject}
+                onChange={(e) => setTimerState({ activeSubject: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl neu-inset text-xs font-bold text-slate-800 dark:text-white border border-white/60 dark:border-slate-700"
+              >
+                {subjects.map((s) => (
+                  <option key={s.id} value={s.name} className="bg-slate-800 text-white">
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                placeholder="Enter subject name (e.g. Maths, Science, History)"
+                value={activeSubject || ''}
+                onChange={(e) => setTimerState({ activeSubject: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl neu-inset text-xs font-bold text-slate-800 dark:text-white border border-white/60 dark:border-slate-700 focus:outline-none"
+              />
+            )}
           </div>
 
           <div>

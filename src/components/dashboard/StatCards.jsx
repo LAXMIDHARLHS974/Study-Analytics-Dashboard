@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, Clock, Flame, ListTodo, TrendingUp } from 'lucide-react';
 import { useTaskStore } from '../../store/useTaskStore';
-import { format, subDays, parseISO, isAfter } from 'date-fns';
+import { calculateStreak, calculateStudyHours } from '../../utils/studyStats';
 
 export default function StatCards() {
   const { tasks, timerLogs } = useTaskStore();
@@ -10,24 +10,18 @@ export default function StatCards() {
   const completedTasks = tasks.filter((t) => t.status === 'Done');
   const pendingTasks = tasks.filter((t) => t.status !== 'Done');
 
-  // Compute total study hours this week from timerLogs
-  const oneWeekAgo = subDays(new Date(), 7);
-  const thisWeekLogs = timerLogs.filter((log) => {
-    try {
-      return isAfter(parseISO(log.date), oneWeekAgo);
-    } catch {
-      return false;
-    }
-  });
+  // Compute dynamic study hours
+  const { thisWeekHours, weeklyDelta } = calculateStudyHours(timerLogs);
 
-  const totalWeeklyHours = thisWeekLogs.reduce((acc, log) => acc + (log.hours || 0), 0).toFixed(1);
+  // Compute dynamic streak
+  const { currentStreak, studiedToday } = calculateStreak(timerLogs, tasks);
 
   const stats = [
     {
       id: 'tasks-completed',
       title: 'Tasks Completed',
       value: `${completedTasks.length}`,
-      subtext: '+16% this week',
+      subtext: `${completedTasks.length > 0 ? `${completedTasks.length} done` : 'No tasks done yet'}`,
       icon: CheckCircle2,
       iconBg: 'bg-[#5FB3B3]',
       iconColor: 'text-white',
@@ -36,9 +30,9 @@ export default function StatCards() {
     {
       id: 'study-hours',
       title: 'Study Hours',
-      value: `${totalWeeklyHours > 0 ? totalWeeklyHours : '34.6'}`,
+      value: `${thisWeekHours}`,
       unit: 'hrs',
-      subtext: '+6.2 this week',
+      subtext: `${weeklyDelta >= 0 ? '+' : ''}${weeklyDelta}h vs last week`,
       icon: Clock,
       iconBg: 'bg-[#6A9AC4]',
       iconColor: 'text-white',
@@ -47,9 +41,9 @@ export default function StatCards() {
     {
       id: 'streak',
       title: 'Current Streak',
-      value: '7',
-      unit: '',
-      subtext: 'days in a row',
+      value: `${currentStreak}`,
+      unit: currentStreak === 1 ? 'day' : 'days',
+      subtext: studiedToday ? 'Active today 🔥' : currentStreak > 0 ? 'Study to keep 🔥' : 'Start streak today',
       icon: Flame,
       iconBg: 'bg-[#7B7FBF]',
       iconColor: 'text-white',
@@ -59,7 +53,7 @@ export default function StatCards() {
       id: 'pending-tasks',
       title: 'Pending Tasks',
       value: `${pendingTasks.length}`,
-      subtext: 'Due today',
+      subtext: pendingTasks.length === 1 ? '1 task left' : `${pendingTasks.length} tasks left`,
       icon: ListTodo,
       iconBg: 'bg-[#52A5B5]',
       iconColor: 'text-white',

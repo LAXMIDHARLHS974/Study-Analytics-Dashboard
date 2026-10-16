@@ -133,17 +133,33 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Subject
               </label>
-              <select
-                value={formData.subjectId}
-                onChange={handleSubjectChange}
-                className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
-              >
-                {subjects.map((s) => (
-                  <option key={s.id} value={s.id} className="bg-slate-800 text-white">
-                    {s.name}
-                  </option>
-                ))}
-              </select>
+              {subjects.length > 0 ? (
+                <select
+                  value={formData.subjectId}
+                  onChange={handleSubjectChange}
+                  className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
+                >
+                  {subjects.map((s) => (
+                    <option key={s.id} value={s.id} className="bg-slate-800 text-white">
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  placeholder="Enter subject name (e.g. Maths, Science)"
+                  value={formData.subject}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      subject: e.target.value,
+                      subjectId: `subj-${Date.now()}`,
+                    })
+                  }
+                  className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
+                />
+              )}
             </div>
 
             <div>

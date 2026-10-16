@@ -57,22 +57,23 @@ export default function TodayTasksCard({ onOpenNewTask }) {
       </div>
 
       {/* Tasks List */}
-      <div className="space-y-2.5 flex-1">
-        {displayTasks.map((task) => {
-          const subject = subjects.find((s) => s.name === task.subject);
-          const color = subject ? subject.color : '#5FB3B3';
-          const isDone = task.status === 'Done';
-          const time12h = formatTo12Hour(task.startTime || '10:00');
+      <div className="space-y-2.5 flex-1 flex flex-col justify-center">
+        {displayTasks.length > 0 ? (
+          displayTasks.map((task) => {
+            const subject = subjects.find((s) => s.name === task.subject);
+            const color = subject ? subject.color : '#5FB3B3';
+            const isDone = task.status === 'Done';
+            const time12h = formatTo12Hour(task.startTime || '10:00');
 
-          return (
-            <div
-              key={task.id}
-              className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
-                isDone
-                  ? 'bg-slate-200/40 dark:bg-slate-800/30 opacity-60 border-transparent'
-                  : 'bg-white/60 dark:bg-slate-800/60 hover:bg-white/90 border-white/80 dark:border-slate-700/60 shadow-sm'
-              }`}
-            >
+            return (
+              <div
+                key={task.id}
+                className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
+                  isDone
+                    ? 'bg-slate-200/40 dark:bg-slate-800/30 opacity-60 border-transparent'
+                    : 'bg-white/60 dark:bg-slate-800/60 hover:bg-white/90 border-white/80 dark:border-slate-700/60 shadow-sm'
+                }`}
+              >
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 {/* Square checkbox button */}
                 <button
@@ -118,7 +119,17 @@ export default function TodayTasksCard({ onOpenNewTask }) {
               </button>
             </div>
           );
-        })}
+        })
+      ) : (
+        <div className="py-6 text-center space-y-2">
+          <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            No study tasks scheduled for today
+          </p>
+          <p className="text-[11px] text-slate-500">
+            Add your subjects and study tasks to plan your day and build your streak!
+          </p>
+        </div>
+      )}
       </div>
     </div>
   );

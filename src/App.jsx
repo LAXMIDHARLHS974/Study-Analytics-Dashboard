@@ -18,11 +18,21 @@ import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 
 import { LayoutDashboard, Clock, CalendarDays, Timer, BarChart3 } from 'lucide-react';
+import { useTaskStore } from './store/useTaskStore';
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+
+  const recordDailyVisit = useTaskStore((state) => state.recordDailyVisit);
+
+  // Automatically record daily visit whenever the user opens/visits the website
+  React.useEffect(() => {
+    if (typeof recordDailyVisit === 'function') {
+      recordDailyVisit();
+    }
+  }, [recordDailyVisit]);
 
   const handleOpenNewTask = () => {
     setEditingTask(null);

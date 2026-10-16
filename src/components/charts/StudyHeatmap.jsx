@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { format, subDays, parseISO, eachDayOfInterval } from 'date-fns';
+import { format, subDays, eachDayOfInterval } from 'date-fns';
 import { useTaskStore } from '../../store/useTaskStore';
 import { Flame, Trophy, Calendar } from 'lucide-react';
+import { calculateStreak } from '../../utils/studyStats';
 
 export default function StudyHeatmap() {
-  const { timerLogs } = useTaskStore();
+  const { timerLogs, tasks } = useTaskStore();
   const [hoveredDay, setHoveredDay] = useState(null);
+
+  const { currentStreak, bestStreak } = calculateStreak(timerLogs, tasks);
 
   // Generate last 112 days (16 weeks x 7 days) for a rich grid layout
   const daysCount = 112;
@@ -60,11 +63,11 @@ export default function StudyHeatmap() {
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-bold border border-amber-500/30">
             <Flame className="w-3.5 h-3.5 fill-current" />
-            <span>7-Day Streak</span>
+            <span>{currentStreak}-Day Streak</span>
           </div>
           <div className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-brand-purple/15 text-brand-purple text-xs font-bold border border-brand-purple/30">
             <Trophy className="w-3.5 h-3.5" />
-            <span>Best: 14 Days</span>
+            <span>Best: {bestStreak} Days</span>
           </div>
         </div>
       </div>

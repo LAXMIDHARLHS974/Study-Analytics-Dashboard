@@ -8,16 +8,16 @@ import {
   ResponsiveContainer, 
   Cell 
 } from 'recharts';
-import { INITIAL_WEEKLY_HOURS } from '../../data/seed';
+import { useTaskStore } from '../../store/useTaskStore';
+import { calculateWeeklyBarData } from '../../utils/studyStats';
 
 export default function StudyOverviewChart() {
+  const { timerLogs } = useTaskStore();
   const [timeRange, setTimeRange] = useState('This Week');
 
-  // Multiplier for previewing last week or this month
-  const data = INITIAL_WEEKLY_HOURS.map((item) => ({
-    ...item,
-    displayHours: timeRange === 'Last Week' ? Number((item.hours * 0.85).toFixed(1)) : item.hours,
-  }));
+  // Compute daily data for the selected week dynamically from timerLogs
+  const data = calculateWeeklyBarData(timerLogs, timeRange);
+  const totalWeekly = data.reduce((acc, item) => acc + (item.hours || 0), 0).toFixed(1);
 
   // Bar colors matching the soft teal-to-blue-to-purple sequence from screenshot
   const barColors = [
@@ -35,8 +35,11 @@ export default function StudyOverviewChart() {
       const d = payload[0].payload;
       return (
         <div className="bg-slate-900/90 text-white p-2.5 rounded-xl shadow-xl text-xs backdrop-blur-md border border-slate-700">
-          <p className="font-bold text-brand-teal">{d.day}</p>
+          <p className="font-bold text-brand-teal">{d.day} ({d.date})</p>
           <p className="text-white font-extrabold text-sm mt-0.5">{d.displayHours} hours</p>
+          {d.tasksCompleted > 0 && (
+            <p className="text-emerald-400 text-[10px] font-semibold">{d.tasksCompleted} tasks completed</p>
+          )}
           <p className="text-[10px] text-slate-400">Target: {d.target}h</p>
         </div>
       );
@@ -52,7 +55,9 @@ export default function StudyOverviewChart() {
           <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">
             Study Overview
           </h3>
-          <p className="text-xs text-slate-500">Weekly study hours</p>
+          <p className="text-xs text-slate-500">
+            {timeRange} study hours • <span className="font-bold text-brand-teal">{totalWeekly}h logged</span>
+          </p>
         </div>
 
         <select

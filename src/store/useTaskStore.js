@@ -10,6 +10,107 @@ import {
   INITIAL_MONTHS_PLAN
 } from '../data/seed';
 
+const FAKE_SUBJECT_NAMES = new Set([
+  'mathematics',
+  'physics',
+  'computer science',
+  'computer sci',
+  'chemistry',
+]);
+
+const FAKE_TASK_IDS = new Set([
+  'task-1', 'task-2', 'task-3', 'task-4', 'task-5', 'task-6', 'task-7', 'task-8', 'task-9', 'task-10', 'task-11'
+]);
+
+// Auto-sanitizer that removes fake demo data while preserving user additions (DSA, English, Backend, JDBC)
+export const sanitizeStoreState = (rawState) => {
+  if (!rawState) return rawState;
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+
+  // Filter out fake subjects
+  let cleanSubjects = (rawState.subjects || []).filter(
+    (s) => s && s.name && !FAKE_SUBJECT_NAMES.has(s.name.trim().toLowerCase())
+  );
+  if (cleanSubjects.length === 0) {
+    cleanSubjects = INITIAL_SUBJECTS;
+  }
+
+  // Filter out fake tasks
+  let cleanTasks = (rawState.tasks || []).filter((t) => {
+    if (!t) return false;
+    if (FAKE_TASK_IDS.has(t.id)) return false;
+    if (t.subject && FAKE_SUBJECT_NAMES.has(t.subject.trim().toLowerCase())) return false;
+    return true;
+  });
+  if (cleanTasks.length === 0) {
+    cleanTasks = INITIAL_TASKS;
+  }
+
+  // Clean timerLogs (strip fake subjects and fake hours)
+  let cleanLogs = (rawState.timerLogs || [])
+    .map((log) => {
+      if (!log) return null;
+      const cleanBreakdown = {};
+      let cleanHours = 0;
+      if (log.subjectBreakdown && typeof log.subjectBreakdown === 'object') {
+        Object.entries(log.subjectBreakdown).forEach(([name, hours]) => {
+          if (!FAKE_SUBJECT_NAMES.has(name.trim().toLowerCase())) {
+            cleanBreakdown[name] = hours;
+            cleanHours += Number(hours) || 0;
+          }
+        });
+      }
+      if (cleanHours === 0 && !log.tasksCompleted && !log.visited) {
+        return null;
+      }
+      return {
+        ...log,
+        hours: Number(cleanHours.toFixed(2)),
+        subjectBreakdown: cleanBreakdown,
+      };
+    })
+    .filter(Boolean);
+
+  // Ensure daily visit for today is recorded
+  const todayIdx = cleanLogs.findIndex((l) => l.date === todayStr);
+  if (todayIdx >= 0) {
+    cleanLogs[todayIdx] = { ...cleanLogs[todayIdx], visited: true };
+  } else {
+    cleanLogs.push({
+      date: todayStr,
+      hours: 0,
+      tasksCompleted: 0,
+      visited: true,
+      subjectBreakdown: {},
+    });
+  }
+
+  return {
+    ...rawState,
+    subjects: cleanSubjects,
+    tasks: cleanTasks,
+    timerLogs: cleanLogs,
+  };
+};
+
+// Immediately sanitize localStorage in the browser
+if (typeof window !== 'undefined' && window.localStorage) {
+  ['build-lhs-v1', 'build-lhs-genuine-v1'].forEach((key) => {
+    try {
+      const item = window.localStorage.getItem(key);
+      if (item) {
+        const parsed = JSON.parse(item);
+        if (parsed && parsed.state) {
+          const sanitized = sanitizeStoreState(parsed.state);
+          window.localStorage.setItem(key, JSON.stringify({ ...parsed, state: sanitized }));
+        }
+      }
+    } catch {
+      // ignore
+    }
+  });
+}
+
 export const useTaskStore = create(
   persist(
     (set, get) => ({
@@ -37,12 +138,39 @@ export const useTaskStore = create(
       // Task actions
       addTask: (newTask) => {
         const id = `task-${Date.now()}`;
+        const subjName = newTask.subject?.trim() || 'General';
+        let subjId = newTask.subjectId;
+
+        let updatedSubjects = [...get().subjects];
+        const existingSubject = updatedSubjects.find(
+          (s) => s.name.toLowerCase() === subjName.toLowerCase()
+        );
+
+        if (!existingSubject && subjName !== 'General') {
+          subjId = `subj-${Date.now()}`;
+          const newSubjObj = {
+            id: subjId,
+            name: subjName,
+            code: subjName.substring(0, 4).toUpperCase(),
+            color: '#5FB3B3',
+            icon: 'BookOpen',
+            targetHoursWeekly: 8,
+            completedHoursThisWeek: 0,
+            syllabusProgress: 0,
+            totalChapters: 10,
+            completedChapters: 0,
+          };
+          updatedSubjects.push(newSubjObj);
+        } else if (existingSubject) {
+          subjId = existingSubject.id;
+        }
+
         const task = {
           id,
           title: newTask.title || 'Untitled Study Task',
           description: newTask.description || '',
-          subjectId: newTask.subjectId || 'subj-math',
-          subject: newTask.subject || 'Mathematics',
+          subjectId: subjId || 'subj-general',
+          subject: subjName,
           date: newTask.date || format(new Date(), 'yyyy-MM-dd'),
           startTime: newTask.startTime || '10:00',
           endTime: newTask.endTime || '11:00',
@@ -57,6 +185,7 @@ export const useTaskStore = create(
 
         set((state) => ({
           tasks: [task, ...state.tasks],
+          subjects: updatedSubjects,
         }));
         return task;
       },
@@ -102,10 +231,8 @@ export const useTaskStore = create(
           ),
         }));
 
-        // If completed, record study log if not already counted today
-        if (nextStatus === 'Done') {
-          get().recordTaskCompletion(task);
-        }
+        // If completed or uncompleted, record/update study log and subject hours
+        get().recordTaskCompletion(task, nextStatus === 'Done');
         return nextStatus === 'Done';
       },
 
@@ -307,20 +434,49 @@ export const useTaskStore = create(
       logStudySession: ({ subjectName, durationMinutes, taskId }) => {
         const todayStr = format(new Date(), 'yyyy-MM-dd');
         const hoursToAdd = Number((durationMinutes / 60).toFixed(2));
+        const cleanSubjName = subjectName?.trim() || 'General';
 
         set((state) => {
+          let updatedSubjects = [...state.subjects];
+          const subjIdx = updatedSubjects.findIndex(
+            (s) => s.name.toLowerCase() === cleanSubjName.toLowerCase()
+          );
+
+          if (subjIdx >= 0) {
+            updatedSubjects[subjIdx] = {
+              ...updatedSubjects[subjIdx],
+              completedHoursThisWeek: Number(
+                ((updatedSubjects[subjIdx].completedHoursThisWeek || 0) + hoursToAdd).toFixed(1)
+              ),
+            };
+          } else if (cleanSubjName !== 'General') {
+            updatedSubjects.push({
+              id: `subj-${Date.now()}`,
+              name: cleanSubjName,
+              code: cleanSubjName.substring(0, 4).toUpperCase(),
+              color: '#5FB3B3',
+              icon: 'BookOpen',
+              targetHoursWeekly: 8,
+              completedHoursThisWeek: hoursToAdd,
+              syllabusProgress: 0,
+              totalChapters: 10,
+              completedChapters: 0,
+            });
+          }
+
           const existingLogIndex = state.timerLogs.findIndex((log) => log.date === todayStr);
           let updatedLogs = [...state.timerLogs];
 
           if (existingLogIndex >= 0) {
             const current = updatedLogs[existingLogIndex];
-            const currentSubjHours = (current.subjectBreakdown && current.subjectBreakdown[subjectName]) || 0;
+            const currentSubjHours =
+              (current.subjectBreakdown && current.subjectBreakdown[cleanSubjName]) || 0;
             updatedLogs[existingLogIndex] = {
               ...current,
-              hours: Number((current.hours + hoursToAdd).toFixed(2)),
+              hours: Number(((current.hours || 0) + hoursToAdd).toFixed(2)),
               subjectBreakdown: {
                 ...(current.subjectBreakdown || {}),
-                [subjectName]: Number((currentSubjHours + hoursToAdd).toFixed(2)),
+                [cleanSubjName]: Number((currentSubjHours + hoursToAdd).toFixed(2)),
               },
             };
           } else {
@@ -329,21 +485,10 @@ export const useTaskStore = create(
               hours: hoursToAdd,
               tasksCompleted: 0,
               subjectBreakdown: {
-                [subjectName]: hoursToAdd,
+                [cleanSubjName]: hoursToAdd,
               },
             });
           }
-
-          // Also update subject completed hours
-          const updatedSubjects = state.subjects.map((s) => {
-            if (s.name === subjectName) {
-              return {
-                ...s,
-                completedHoursThisWeek: Number((s.completedHoursThisWeek + hoursToAdd).toFixed(1)),
-              };
-            }
-            return s;
-          });
 
           return {
             timerLogs: updatedLogs,
@@ -352,27 +497,82 @@ export const useTaskStore = create(
         });
       },
 
-      recordTaskCompletion: (task) => {
+      recordTaskCompletion: (task, isCompleting = true) => {
         const todayStr = format(new Date(), 'yyyy-MM-dd');
+        const taskHours = Number(((task.duration || 60) / 60).toFixed(2));
+        const subjName = task.subject || 'General';
+
         set((state) => {
           const logIdx = state.timerLogs.findIndex((l) => l.date === todayStr);
           let updatedLogs = [...state.timerLogs];
-          if (logIdx >= 0) {
-            updatedLogs[logIdx] = {
-              ...updatedLogs[logIdx],
-              tasksCompleted: (updatedLogs[logIdx].tasksCompleted || 0) + 1,
-            };
-          } else {
-            updatedLogs.push({
-              date: todayStr,
-              hours: Number((task.duration / 60).toFixed(1)),
-              tasksCompleted: 1,
-              subjectBreakdown: {
-                [task.subject]: Number((task.duration / 60).toFixed(1)),
-              },
+
+          if (isCompleting) {
+            if (logIdx >= 0) {
+              const current = updatedLogs[logIdx];
+              const curSubj = (current.subjectBreakdown && current.subjectBreakdown[subjName]) || 0;
+              updatedLogs[logIdx] = {
+                ...current,
+                hours: Number(((current.hours || 0) + taskHours).toFixed(2)),
+                tasksCompleted: (current.tasksCompleted || 0) + 1,
+                subjectBreakdown: {
+                  ...(current.subjectBreakdown || {}),
+                  [subjName]: Number((curSubj + taskHours).toFixed(2)),
+                },
+              };
+            } else {
+              updatedLogs.push({
+                date: todayStr,
+                hours: taskHours,
+                tasksCompleted: 1,
+                subjectBreakdown: {
+                  [subjName]: taskHours,
+                },
+              });
+            }
+
+            const updatedSubjects = state.subjects.map((s) => {
+              if (s.name === subjName || s.id === task.subjectId) {
+                return {
+                  ...s,
+                  completedHoursThisWeek: Number(((s.completedHoursThisWeek || 0) + taskHours).toFixed(1)),
+                };
+              }
+              return s;
             });
+
+            return { timerLogs: updatedLogs, subjects: updatedSubjects };
+          } else {
+            // Uncompleting a task
+            if (logIdx >= 0) {
+              const current = updatedLogs[logIdx];
+              const curSubj = (current.subjectBreakdown && current.subjectBreakdown[subjName]) || 0;
+              const newHours = Math.max(0, Number(((current.hours || 0) - taskHours).toFixed(2)));
+              const newSubjHours = Math.max(0, Number((curSubj - taskHours).toFixed(2)));
+              const newTasksCompleted = Math.max(0, (current.tasksCompleted || 1) - 1);
+
+              updatedLogs[logIdx] = {
+                ...current,
+                hours: newHours,
+                tasksCompleted: newTasksCompleted,
+                subjectBreakdown: {
+                  ...(current.subjectBreakdown || {}),
+                  [subjName]: newSubjHours,
+                },
+              };
+            }
+
+            const updatedSubjects = state.subjects.map((s) => {
+              if (s.name === subjName || s.id === task.subjectId) {
+                return {
+                  ...s,
+                  completedHoursThisWeek: Math.max(0, Number(((s.completedHoursThisWeek || 0) - taskHours).toFixed(1))),
+                };
+              }
+              return s;
+            });
+
+            return { timerLogs: updatedLogs, subjects: updatedSubjects };
           }
-          return { timerLogs: updatedLogs };
         });
       },
 
@@ -418,11 +618,38 @@ export const useTaskStore = create(
         }
       },
 
+      // Daily visit tracking: increments streak every day user visits the website
+      recordDailyVisit: () => {
+        const todayStr = format(new Date(), 'yyyy-MM-dd');
+        set((state) => {
+          const logIdx = state.timerLogs.findIndex((l) => l.date === todayStr);
+          if (logIdx >= 0) {
+            if (state.timerLogs[logIdx].visited) return state;
+            const updatedLogs = [...state.timerLogs];
+            updatedLogs[logIdx] = { ...updatedLogs[logIdx], visited: true };
+            return { timerLogs: updatedLogs };
+          } else {
+            return {
+              timerLogs: [
+                ...state.timerLogs,
+                {
+                  date: todayStr,
+                  hours: 0,
+                  tasksCompleted: 0,
+                  visited: true,
+                  subjectBreakdown: {},
+                },
+              ],
+            };
+          }
+        });
+      },
+
       resetAllData: () => {
         set({
           tasks: INITIAL_TASKS,
           subjects: INITIAL_SUBJECTS,
-          goals: INITIAL_GOALS,
+          goals: [],
           routines: INITIAL_ROUTINES,
           timerLogs: INITIAL_TIMER_LOGS,
           yearlyPlan: INITIAL_MONTHS_PLAN,
@@ -431,7 +658,29 @@ export const useTaskStore = create(
     }),
     {
       name: 'build-lhs-v1',
-      version: 1,
+      version: 2,
+      migrate: (persistedState) => {
+        return sanitizeStoreState(persistedState);
+      },
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          const sanitized = sanitizeStoreState(state);
+          useTaskStore.setState(sanitized);
+          if (typeof state.recordDailyVisit === 'function') {
+            state.recordDailyVisit();
+          }
+        }
+      },
     }
   )
 );
+
+// Trigger daily visit tracking immediately on load
+try {
+  if (typeof useTaskStore.getState === 'function') {
+    useTaskStore.getState().recordDailyVisit();
+  }
+} catch {
+  // ignore
+}
+

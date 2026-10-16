@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }) {
         </button>
 
         <div className="relative group cursor-pointer">
-          <div className="w-20 h-20 rounded-2xl p-1 bg-gradient-to-tr from-brand-teal/80 via-brand-blue/60 to-brand-purple/80 shadow-lg">
+          <div className="w-20 h-20 rounded-2xl p-1 bg-gradient-to-tr from-royal-600 via-royal-500 to-violet-neon shadow-lg">
             <img
               src={userAvatar || '/assets/student_avatar.jpg'}
               alt={userName}
@@ -75,9 +75,9 @@ export default function Sidebar({ isOpen, onClose }) {
 
         <h2 className="mt-3 text-lg font-bold text-white tracking-wide flex items-center gap-1.5">
           <span>Hi, {userName}!</span>
-          <span className="text-brand-teal text-sm">✨</span>
+          <span className="text-violet-neon text-sm">✨</span>
         </h2>
-        <p className="text-xs text-slate-400 font-medium truncate max-w-[220px]">
+        <p className="text-xs text-slate-300 font-medium truncate max-w-[220px]">
           {userMotto || 'Stay Focused & Consistent'}
         </p>
       </div>
@@ -94,8 +94,8 @@ export default function Sidebar({ isOpen, onClose }) {
               className={({ isActive }) => `
                 ${item.hideOnMobile ? 'hidden md:flex' : 'flex'} items-center gap-3.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
                 ${isActive
-                  ? 'bg-brand-teal/25 text-white border border-brand-teal/40 shadow-[0_4px_16px_rgba(95,179,179,0.35)] backdrop-blur-md font-bold'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-white/10 dark:hover:bg-white/5'
+                  ? 'bg-gradient-to-r from-royal-600/35 to-violet-neon/25 text-white border border-royal-400/40 shadow-[0_4px_16px_rgba(37,99,235,0.35)] backdrop-blur-md font-bold'
+                  : 'text-slate-300 hover:text-white hover:bg-white/10 dark:hover:bg-white/5'
                 }
               `}
             >
@@ -103,7 +103,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 <>
                   <div
                     className={`w-7 h-7 rounded-xl flex items-center justify-center transition-colors ${isActive
-                      ? 'bg-brand-teal/30 text-brand-teal'
+                      ? 'bg-royal-500/30 text-royal-300'
                       : 'text-slate-400 group-hover:text-slate-200'
                       }`}
                   >
@@ -111,7 +111,7 @@ export default function Sidebar({ isOpen, onClose }) {
                   </div>
                   <span className="flex-1">{item.label}</span>
                   {item.path === '/today' && pendingCount > 0 && (
-                    <span className="px-2 py-0.5 text-[11px] rounded-full bg-brand-teal/25 text-brand-teal font-bold border border-brand-teal/30">
+                    <span className="px-2 py-0.5 text-[11px] rounded-full bg-royal-500/25 text-royal-300 font-bold border border-royal-500/30">
                       {pendingCount}
                     </span>
                   )}

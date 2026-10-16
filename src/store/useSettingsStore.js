@@ -8,9 +8,9 @@ export const useSettingsStore = create(
       userAvatar: '/assets/student_avatar.jpg',
       userMotto: 'Building high focus, one sprint at a time 🎯',
       isPro: true,
-      
+
       // Theme
-      theme: 'light', // 'light' | 'dark'
+      theme: 'dark', // 'light' | 'dark'
       toggleTheme: () => {
         const next = get().theme === 'light' ? 'dark' : 'light';
         set({ theme: next });

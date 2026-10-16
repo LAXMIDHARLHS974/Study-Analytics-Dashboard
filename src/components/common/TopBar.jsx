@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Bell, 
-  Plus, 
-  Sun, 
-  Moon, 
-  Menu, 
-  Timer, 
-  AlertCircle, 
-  Check, 
+import {
+  Search,
+  Bell,
+  Plus,
+  Sun,
+  Moon,
+  Menu,
+  Timer,
+  AlertCircle,
+  Check,
   ArrowRight,
   Flame,
   Volume2,
@@ -142,12 +142,12 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search tasks, subjects... [ / ]"
-              className="w-full pl-9 pr-8 py-2 text-xs lg:text-sm font-medium rounded-full neu-inset border border-white/10 focus:outline-none focus:ring-2 focus:ring-royal-500/60 focus:border-royal-400/50 text-white placeholder:text-slate-400/70 transition-all"
+              className="w-full pl-9 pr-8 py-2 text-xs lg:text-sm font-semibold rounded-full neu-inset border border-slate-300/60 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-royal-500/60 focus:border-royal-400/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400/70 transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-400 hover:text-white"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               >
                 ✕
               </button>
@@ -157,14 +157,13 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
           {/* Quick Pomodoro Pill (Desktop only - mobile has bottom bar Timer) */}
           <button
             onClick={() => navigate('/timer')}
-            className={`hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-md ${
-              isTimerRunning
+            className={`hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-md ${isTimerRunning
                 ? 'bg-gradient-to-r from-royal-600 to-violet-neon text-white shadow-[0_0_15px_rgba(139,92,246,0.5)] animate-pulse'
-                : 'neu-pill-btn text-slate-200'
-            }`}
+                : 'neu-pill-btn text-slate-800 dark:text-slate-100 hover:text-royal-600 dark:hover:text-royal-300'
+              }`}
             title="Open Focus Timer"
           >
-            <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-royal-600 dark:text-royal-400" />
             <span className="hidden sm:inline">
               {isTimerRunning ? formatTimerMinSec(timerSecondsLeft) : '25m Focus'}
             </span>
@@ -175,7 +174,7 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               aria-label="View notifications"
-              className="p-2 sm:p-2.5 rounded-full neu-pill-btn relative text-slate-200 hover:text-royal-400"
+              className="p-2 sm:p-2.5 rounded-full neu-pill-btn relative text-slate-700 dark:text-slate-200 hover:text-royal-600 dark:hover:text-royal-400"
             >
               <Bell className="w-4 h-4" />
               {overdueTasks.length > 0 && (
@@ -273,7 +272,7 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
           </button>
 
           {/* Profile Avatar Pill in Topbar for Mobile */}
-          <button 
+          <button
             onClick={() => navigate('/settings')}
             aria-label="Open Settings"
             className="w-8 h-8 sm:w-9 sm:h-9 rounded-full ring-2 ring-brand-teal/50 shadow overflow-hidden md:hidden active:scale-95 transition-all shrink-0"

@@ -1,36 +1,57 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>BUILD LHS - Study Planner & Daily Routine Tracker</title>
-    <meta name="description" content="A tactile neumorphic study planning and daily routine tracking app with Pomodoro focus sessions, syllabus analytics, and streak tracking." />
-    
-    <!-- PWA Settings -->
-    <meta name="theme-color" content="#202D42" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="BUILD LHS" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.json" />
+<html lang="en" class="dark">
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
-  </head>
-  <body class="bg-[#9EB1C5] dark:bg-[#0f172a] text-slate-800 dark:text-slate-100 antialiased selection:bg-brand-teal selection:text-white transition-colors duration-300">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch((err) => {
-            console.error('ServiceWorker registration error:', err);
-          });
-        });
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>BUILD LHS - Study Planner & Daily Routine Tracker</title>
+  <meta name="description"
+    content="A tactile neumorphic study planning and daily routine tracking app with Pomodoro focus sessions, syllabus analytics, and streak tracking." />
+
+  <!-- PWA Settings -->
+  <meta name="theme-color" content="#070B19" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="BUILD LHS" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&display=swap"
+    rel="stylesheet">
+
+  <script>
+    try {
+      var stored = localStorage.getItem('build-lhs-settings');
+      if (stored) {
+        var parsed = JSON.parse(stored);
+        if (parsed && parsed.state && parsed.state.theme === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else {
+          document.documentElement.classList.add('dark');
+        }
       }
-    </script>
-  </body>
+    } catch (e) {}
+  </script>
+</head>
+
+<body
+  class="bg-[#eaf1f8] dark:bg-[#070B19] text-slate-900 dark:text-slate-100 antialiased selection:bg-royal-500 selection:text-white transition-colors duration-300">
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
+          console.error('ServiceWorker registration error:', err);
+        });
+      });
+    }
+  </script>
+</body>
+
 </html>

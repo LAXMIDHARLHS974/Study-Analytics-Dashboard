@@ -19,6 +19,7 @@ import Settings from './pages/Settings';
 
 import { Home, Compass, BarChart3, Timer, User } from 'lucide-react';
 import { useTaskStore } from './store/useTaskStore';
+import { useSettingsStore } from './store/useSettingsStore';
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -26,6 +27,16 @@ export default function App() {
   const [editingTask, setEditingTask] = useState(null);
 
   const recordDailyVisit = useTaskStore((state) => state.recordDailyVisit);
+  const theme = useSettingsStore((state) => state.theme);
+
+  // Synchronize theme with document root classList
+  React.useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   // Automatically record daily visit whenever the user opens/visits the website
   React.useEffect(() => {
@@ -121,10 +132,9 @@ export default function App() {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
-                  isActive
-                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${isActive
+                  ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                  : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
                 }`
               }
             >
@@ -142,10 +152,9 @@ export default function App() {
             <NavLink
               to="/today"
               className={({ isActive }) =>
-                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
-                  isActive
-                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${isActive
+                  ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                  : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
                 }`
               }
             >
@@ -163,10 +172,9 @@ export default function App() {
             <NavLink
               to="/analytics"
               className={({ isActive }) =>
-                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
-                  isActive
-                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${isActive
+                  ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                  : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
                 }`
               }
               title="Study Analytics"
@@ -185,10 +193,9 @@ export default function App() {
             <NavLink
               to="/timer"
               className={({ isActive }) =>
-                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
-                  isActive
-                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${isActive
+                  ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                  : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
                 }`
               }
             >
@@ -206,10 +213,9 @@ export default function App() {
             <NavLink
               to="/settings"
               className={({ isActive }) =>
-                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${
-                  isActive
-                    ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
+                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${isActive
+                  ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
+                  : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
                 }`
               }
             >

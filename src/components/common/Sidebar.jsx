@@ -11,7 +11,6 @@ import {
   Settings,
   Timer,
   Sparkles,
-  Crown,
   Layers,
   Flame,
   ListTodo,
@@ -120,31 +119,6 @@ export default function Sidebar({ isOpen, onClose }) {
           );
         })}
       </nav>
-
-      {/* Bottom Pro Card (Matching Screenshot "Go Premium" Look) - hidden on mobile drawer */}
-      <div className="pt-2 hidden md:block">
-        <div className="rounded-2xl p-3.5 bg-gradient-to-b from-[#28374F] to-[#1C2739] border border-slate-700/60 shadow-lg relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-brand-teal/10 rounded-full blur-xl group-hover:bg-brand-teal/20 transition-all"></div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center shadow-inner">
-              <Crown className="w-4 h-4 fill-amber-400" />
-            </div>
-            <div>
-              <h4 className="text-xs font-bold text-white tracking-wide">BUILD LHS Pro</h4>
-              <p className="text-[10px] text-slate-400">Offline & Deep Focus</p>
-            </div>
-          </div>
-          <p className="text-[11px] text-slate-300 leading-tight mb-2.5">
-            Full Pomodoro soundscapes, unlimited routines & cloud backup.
-          </p>
-          <NavLink
-            to="/timer"
-            className="w-full block text-center py-2 px-3 rounded-xl text-xs font-semibold bg-gradient-to-r from-brand-teal to-brand-blue text-white shadow-md hover:brightness-110 active:scale-95 transition-all"
-          >
-            Start Focus Sprint ⏱️
-          </NavLink>
-        </div>
-      </div>
     </aside>
   );
 }

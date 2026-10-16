@@ -1,0 +1,32 @@
+{
+  "name": "BUILD LHS - Study Planner & Daily Routine Tracker",
+  "short_name": "BUILD LHS",
+  "description": "Tactile neumorphic study planner, Pomodoro focus timer, task manager, and routine tracker.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#202D42",
+  "theme_color": "#202D42",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -6,6 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>BUILD LHS - Study Planner & Daily Routine Tracker</title>
     <meta name="description" content="A tactile neumorphic study planning and daily routine tracking app with Pomodoro focus sessions, syllabus analytics, and streak tracking." />
+    
+    <!-- PWA Settings -->
+    <meta name="theme-color" content="#202D42" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BUILD LHS" />
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <link rel="manifest" href="/manifest.json" />
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,5 +23,14 @@
   <body class="bg-[#9EB1C5] dark:bg-[#0f172a] text-slate-800 dark:text-slate-100 antialiased selection:bg-brand-teal selection:text-white transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.error('ServiceWorker registration error:', err);
+          });
+        });
+      }
+    </script>
   </body>
 </html>

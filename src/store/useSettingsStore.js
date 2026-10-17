@@ -40,6 +40,12 @@ export const useSettingsStore = create(
 
       // Notifications
       notificationsEnabled: true,
+      readNotificationIds: [],
+      markAllNotificationsAsRead: (ids = []) => {
+        const current = get().readNotificationIds || [];
+        set({ readNotificationIds: Array.from(new Set([...current, ...ids])) });
+      },
+      clearReadNotifications: () => set({ readNotificationIds: [] }),
 
       // Active Pomodoro State
       isTimerRunning: false,

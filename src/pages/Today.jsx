@@ -5,9 +5,6 @@ import {
   addDays,
   subDays,
   isSameDay,
-  parseISO,
-  startOfDay,
-  isBefore,
   startOfWeek,
   endOfWeek,
   eachDayOfInterval
@@ -18,7 +15,6 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
-  AlertCircle,
   ArrowRight,
   Sparkles,
   Play,
@@ -41,7 +37,7 @@ import { triggerConfetti } from '../utils/confetti';
 
 export default function Today({ onOpenNewTask, onEditTask }) {
   const navigate = useNavigate();
-  const { tasks, subjects, routines, carryForwardOverdueTasks, applyRoutineToDate, toggleTaskStatus } = useTaskStore();
+  const { tasks, subjects, routines, applyRoutineToDate, toggleTaskStatus } = useTaskStore();
   const { setTimerState } = useSettingsStore();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -68,16 +64,6 @@ export default function Today({ onOpenNewTask, onEditTask }) {
   const currentHour = currentTime.getHours();
   const formattedCurrentTime = format(currentTime, 'h:mm a');
 
-  // Overdue check
-  const todayStart = startOfDay(new Date());
-  const overdueTasks = tasks.filter((t) => {
-    if (t.status === 'Done') return false;
-    try {
-      return isBefore(parseISO(t.date), todayStart);
-    } catch {
-      return false;
-    }
-  });
 
   // Tasks for the selected date
   const allDateTasks = useMemo(() => {
@@ -357,24 +343,6 @@ export default function Today({ onOpenNewTask, onEditTask }) {
           )}
         </div>
       </div>
-
-      {/* 3. Overdue Alert (if any) */}
-      {isToday && overdueTasks.length > 0 && (
-        <div className="clay-card p-2.5 sm:p-3 bg-rose-500/10 border border-rose-500/30 flex items-center justify-between gap-2 rounded-xl text-xs">
-          <div className="flex items-center gap-2 min-w-0">
-            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
-            <span className="font-bold text-slate-900 dark:text-white truncate">
-              {overdueTasks.length} pending task{overdueTasks.length > 1 ? 's' : ''} from previous days
-            </span>
-          </div>
-          <button
-            onClick={() => carryForwardOverdueTasks(selectedDateStr)}
-            className="neu-pill-btn px-2.5 py-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 shrink-0"
-          >
-            Move to Today →
-          </button>
-        </div>
-      )}
 
       {/* 4. SHORT & COMPACT HOURLY TIMELINE */}
       <div className="clay-card p-3.5 sm:p-4 shadow-glass-card border border-white/10 space-y-3">

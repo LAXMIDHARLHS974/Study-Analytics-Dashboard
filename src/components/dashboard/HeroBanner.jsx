@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Sparkles, Flame, Clock, BookOpen } from 'lucide-react';
+import { Play, Sparkles, Flame, Clock } from 'lucide-react';
+import { format } from 'date-fns';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useTaskStore } from '../../store/useTaskStore';
 import { calculateStreak } from '../../utils/studyStats';
@@ -20,8 +21,9 @@ export default function HeroBanner() {
     return 'Good Evening';
   };
 
-  const pendingTasks = tasks.filter((t) => t.status !== 'Done');
-  const nextTask = pendingTasks[0] || tasks[0];
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const todayPendingTasks = tasks.filter((t) => t.date === todayStr && t.status !== 'Done');
+  const nextTask = todayPendingTasks[0] || tasks.find((t) => t.date === todayStr) || tasks.filter((t) => t.status !== 'Done')[0] || tasks[0];
 
   const handleStartStudying = () => {
     if (nextTask) {

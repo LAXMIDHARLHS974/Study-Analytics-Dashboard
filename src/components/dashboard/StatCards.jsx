@@ -1,14 +1,17 @@
 import React from 'react';
 import { CheckCircle2, Clock, Flame, ListTodo, TrendingUp } from 'lucide-react';
+import { format } from 'date-fns';
 import { useTaskStore } from '../../store/useTaskStore';
 import { calculateStreak, calculateStudyHours } from '../../utils/studyStats';
 
 export default function StatCards() {
   const { tasks, timerLogs } = useTaskStore();
 
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+
   // Completed tasks count
   const completedTasks = tasks.filter((t) => t.status === 'Done');
-  const pendingTasks = tasks.filter((t) => t.status !== 'Done');
+  const todayPendingTasks = tasks.filter((t) => t.date === todayStr && t.status !== 'Done');
 
   // Compute dynamic study hours
   const { thisWeekHours, weeklyDelta } = calculateStudyHours(timerLogs);
@@ -52,8 +55,12 @@ export default function StatCards() {
     {
       id: 'pending-tasks',
       title: 'Pending Tasks',
-      value: `${pendingTasks.length}`,
-      subtext: pendingTasks.length === 1 ? '1 task left' : `${pendingTasks.length} tasks left`,
+      value: `${todayPendingTasks.length}`,
+      subtext: todayPendingTasks.length === 1
+        ? '1 task left'
+        : todayPendingTasks.length === 0
+          ? 'All caught up 🎉'
+          : `${todayPendingTasks.length} tasks left`,
       icon: ListTodo,
       iconBg: 'bg-gradient-to-tr from-[#2563EB] to-[#8B5CF6]',
       iconColor: 'text-white',

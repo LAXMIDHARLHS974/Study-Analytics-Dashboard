@@ -30,7 +30,7 @@ const navItems = [
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
-  const { userName, userAvatar, userMotto } = useSettingsStore();
+  const { userName, userAvatar } = useSettingsStore();
 
   return (
     <aside

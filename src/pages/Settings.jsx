@@ -10,25 +10,18 @@ import {
   AlertTriangle,
   Camera,
   Trash2,
-  Sparkles,
   UploadCloud,
   ExternalLink
 } from 'lucide-react';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useTaskStore } from '../store/useTaskStore';
 
-const AVATAR_OPTIONS = [
-  { id: 'boy', name: 'Clay Boy (Headphones)', path: '/assets/student_avatar.jpg' },
-  { id: 'shelf', name: 'Study Desk Hero', path: '/assets/student_shelf_hero.jpg' },
-  { id: 'star', name: 'Cute Star Mascot', path: '/assets/cute_star_mascot.jpg' },
-  { id: 'nook', name: 'Cozy Nook', path: '/assets/cozy_study_nook.jpg' },
-];
+const DEFAULT_AVATAR = '/assets/student_avatar.jpg';
 
 export default function Settings() {
   const { 
     userName, 
     userAvatar, 
-    userMotto, 
     updateProfile 
   } = useSettingsStore();
 
@@ -37,7 +30,6 @@ export default function Settings() {
   const fileInputRef = useRef(null);
   const avatarInputRef = useRef(null);
   const [profileName, setProfileName] = useState(userName);
-  const [profileMotto, setProfileMotto] = useState(userMotto);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -116,14 +108,14 @@ export default function Settings() {
   };
 
   const handleResetAvatar = () => {
-    updateProfile({ userAvatar: '/assets/student_avatar.jpg' });
+    updateProfile({ userAvatar: DEFAULT_AVATAR });
     setFeedbackMsg('Avatar reset to default! ✨');
     setTimeout(() => setFeedbackMsg(''), 3000);
   };
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
-    updateProfile({ userName: profileName, userMotto: profileMotto });
+    updateProfile({ userName: profileName });
     setFeedbackMsg('Profile updated successfully! ✨');
     setTimeout(() => setFeedbackMsg(''), 3000);
   };
@@ -155,7 +147,7 @@ export default function Settings() {
     setTimeout(() => setFeedbackMsg(''), 3000);
   };
 
-  const isCustomUploadedAvatar = userAvatar && !AVATAR_OPTIONS.some((a) => a.path === userAvatar);
+  const isCustomUploadedAvatar = Boolean(userAvatar && userAvatar !== DEFAULT_AVATAR);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -274,8 +266,8 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Form: Name & Motto */}
-          <div className="md:col-span-7 flex flex-col justify-between h-full">
+          {/* Form: Name */}
+          <div className="md:col-span-7 flex flex-col justify-center h-full">
             <form onSubmit={handleSaveProfile} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
@@ -291,20 +283,6 @@ export default function Settings() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Focus Motto / Tagline</span>
-                </label>
-                <input
-                  type="text"
-                  value={profileMotto}
-                  onChange={(e) => setProfileMotto(e.target.value)}
-                  placeholder="e.g. Building high focus, one sprint at a time"
-                  className="w-full px-4 py-2.5 rounded-xl neu-inset border border-slate-200/80 dark:border-slate-700/80 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50"
-                />
-              </div>
-
               <div className="pt-2">
                 <button 
                   type="submit" 
@@ -315,40 +293,6 @@ export default function Settings() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-
-        {/* 3D Clay Avatar Preset Switcher */}
-        <div className="pt-4 border-t border-slate-200/60 dark:border-slate-700/60">
-          <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-3">
-            Or choose a 3D Avatar character
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-            {AVATAR_OPTIONS.map((av) => (
-              <button
-                key={av.id}
-                type="button"
-                onClick={() => {
-                  updateProfile({ userAvatar: av.path });
-                  setFeedbackMsg(`Switched avatar to ${av.name}! ✨`);
-                  setTimeout(() => setFeedbackMsg(''), 3000);
-                }}
-                className={`p-2.5 rounded-2xl flex items-center gap-3 transition-all border text-left ${
-                  userAvatar === av.path
-                    ? 'ring-2 ring-teal-500 bg-teal-500/10 border-teal-500 shadow-sm'
-                    : 'bg-white/40 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-700/60 hover:border-teal-400'
-                }`}
-              >
-                <img
-                  src={av.path}
-                  alt={av.name}
-                  className="w-10 h-10 object-cover rounded-xl shadow shrink-0"
-                />
-                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 truncate">
-                  {av.name}
-                </span>
-              </button>
-            ))}
           </div>
         </div>
       </div>

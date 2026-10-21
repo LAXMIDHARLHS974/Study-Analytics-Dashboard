@@ -55,9 +55,6 @@ export default function StudyOverviewChart() {
           <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">
             Study Overview
           </h3>
-          <p className="text-xs text-slate-500">
-            {timeRange} study hours • <span className="font-bold text-brand-teal">{totalWeekly}h logged</span>
-          </p>
         </div>
 
         <select

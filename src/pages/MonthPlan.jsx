@@ -55,7 +55,6 @@ export default function MonthPlan({ onOpenNewTask, onEditTask }) {
             <h2 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white">
               {format(currentMonth, 'MMMM yyyy')}
             </h2>
-            <p className="text-xs text-slate-500">Interactive Calendar & Task Dots</p>
           </div>
         </div>
 

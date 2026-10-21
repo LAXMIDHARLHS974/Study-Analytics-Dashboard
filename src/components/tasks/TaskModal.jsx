@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Clock, BookOpen, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { X, Sparkles, Trash2 } from 'lucide-react';
 import { useTaskStore } from '../../store/useTaskStore';
 import { format } from 'date-fns';
 import { formatTo12Hour } from '../../utils/timeFormat';
 
 export default function TaskModal({ isOpen, onClose, initialTask = null }) {
-  const { subjects, goals, addTask, updateTask } = useTaskStore();
+  const { subjects, goals, addTask, updateTask, deleteTask } = useTaskStore();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -98,7 +98,6 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
               <h3 className="text-lg font-bold text-slate-800 dark:text-white">
                 {initialTask ? 'Edit Study Task' : 'Plan New Study Task'}
               </h3>
-              <p className="text-xs text-slate-500">Design your focus sprint</p>
             </div>
           </div>
           <button
@@ -298,20 +297,38 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-300/40 dark:border-slate-700/60">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-full neu-pill-btn text-xs font-semibold text-slate-700 dark:text-slate-300"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2 rounded-full neu-teal-btn text-xs font-bold shadow-lg"
-            >
-              {initialTask ? 'Save Changes' : 'Create Task 🎯'}
-            </button>
+          <div className="pt-3 flex items-center justify-between gap-3 border-t border-slate-300/40 dark:border-slate-700/60">
+            {initialTask ? (
+              <button
+                type="button"
+                onClick={() => {
+                  deleteTask(initialTask.id);
+                  onClose();
+                }}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-500 hover:text-white hover:bg-rose-500 border border-rose-300 dark:border-rose-800/60 transition-all flex items-center gap-1.5 active:scale-95"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete Task</span>
+              </button>
+            ) : (
+              <div />
+            )}
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-xl neu-pill-btn text-xs font-semibold text-slate-700 dark:text-slate-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-2 rounded-xl neu-teal-btn text-xs font-bold shadow-lg"
+              >
+                {initialTask ? 'Save Changes' : 'Create Task'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

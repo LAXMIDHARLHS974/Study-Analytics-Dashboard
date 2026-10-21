@@ -2,9 +2,12 @@ import {
   format, 
   subDays, 
   addDays, 
+  subWeeks,
+  subMonths,
   startOfWeek, 
   endOfWeek, 
   startOfMonth, 
+  endOfMonth,
   differenceInCalendarDays, 
   parseISO 
 } from 'date-fns';
@@ -339,5 +342,203 @@ export const calculateSubjectDistribution = (timerLogs = [], subjects = [], time
     activeDistribution: activeItems.length > 0 ? activeItems : items,
     totalHours,
     activeCount: activeItems.length,
+  };
+};
+
+/**
+ * Calculates genuine dynamic trend data for Task Completion Trend
+ * Supports 'weekly' (past 8 weeks), 'daily' (past 14 days), 'monthly' (past 6 months)
+ */
+export const calculateTaskCompletionTrend = (tasks = [], timerLogs = [], viewMode = 'weekly') => {
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const safeLogs = Array.isArray(timerLogs) ? timerLogs : [];
+  const today = new Date();
+
+  // Map timer logs by date for genuine hours and task counts
+  const logMap = {};
+  safeLogs.forEach((l) => {
+    if (l && l.date) {
+      logMap[l.date] = l;
+    }
+  });
+
+  if (viewMode === 'daily') {
+    // Past 14 days
+    const days = [];
+    let sumPlanned = 0;
+    let sumCompleted = 0;
+
+    for (let i = 13; i >= 0; i--) {
+      const d = subDays(today, i);
+      const dateStr = format(d, 'yyyy-MM-dd');
+      const dayLabel = format(d, 'd MMM'); // e.g. "21 Oct"
+      
+      const dayTasks = safeTasks.filter((t) => t && t.date === dateStr);
+      const tasksDoneCount = dayTasks.filter((t) => t.status === 'Done').length;
+      const log = logMap[dateStr];
+      const logDone = (log?.tasksCompleted && dayTasks.length === 0) ? log.tasksCompleted : 0;
+      const completed = tasksDoneCount + logDone;
+      const planned = Math.max(dayTasks.length, completed);
+
+      sumPlanned += planned;
+      sumCompleted += completed;
+
+      const rate = planned > 0 ? Math.round((completed / planned) * 100) : (completed > 0 ? 100 : 0);
+      const hours = log ? getGenuineLogHours(log) : 0;
+
+      days.push({
+        label: dayLabel,
+        fullDate: dateStr,
+        planned,
+        completed,
+        rate,
+        hours,
+        isToday: dateStr === format(today, 'yyyy-MM-dd'),
+      });
+    }
+
+    const overallRate = sumPlanned > 0 ? Math.round((sumCompleted / sumPlanned) * 100) : 0;
+
+    return {
+      data: days,
+      totalPlanned: sumPlanned,
+      totalCompleted: sumCompleted,
+      overallRate,
+      currentRate: days[days.length - 1]?.rate || 0,
+    };
+  }
+
+  if (viewMode === 'monthly') {
+    // Past 6 months
+    const months = [];
+    let sumPlanned = 0;
+    let sumCompleted = 0;
+
+    for (let i = 5; i >= 0; i--) {
+      const d = subMonths(today, i);
+      const monthStart = startOfMonth(d);
+      const monthEnd = endOfMonth(d);
+      const monthLabel = format(d, 'MMMM yyyy');
+      const shortLabel = format(d, 'MMM');
+
+      const monthTasks = safeTasks.filter((t) => {
+        if (!t || !t.date) return false;
+        try {
+          const td = parseISO(t.date);
+          return td >= monthStart && td <= monthEnd;
+        } catch {
+          return false;
+        }
+      });
+
+      const completedInStore = monthTasks.filter((t) => t.status === 'Done').length;
+      let hours = 0;
+      let logTasksDone = 0;
+
+      safeLogs.forEach((l) => {
+        if (!l || !l.date) return;
+        try {
+          const ld = parseISO(l.date);
+          if (ld >= monthStart && ld <= monthEnd) {
+            hours += getGenuineLogHours(l);
+            logTasksDone += Number(l.tasksCompleted) || 0;
+          }
+        } catch {}
+      });
+
+      const completed = Math.max(completedInStore, logTasksDone);
+      const planned = Math.max(monthTasks.length, completed);
+
+      sumPlanned += planned;
+      sumCompleted += completed;
+
+      const rate = planned > 0 ? Math.round((completed / planned) * 100) : (completed > 0 ? 100 : 0);
+
+      months.push({
+        label: shortLabel,
+        fullDate: monthLabel,
+        planned,
+        completed,
+        rate,
+        hours: Number(hours.toFixed(1)),
+        isCurrent: i === 0,
+      });
+    }
+
+    const overallRate = sumPlanned > 0 ? Math.round((sumCompleted / sumPlanned) * 100) : 0;
+
+    return {
+      data: months,
+      totalPlanned: sumPlanned,
+      totalCompleted: sumCompleted,
+      overallRate,
+      currentRate: months[months.length - 1]?.rate || 0,
+    };
+  }
+
+  // Default: 'weekly' (past 8 weeks leading to current week)
+  const weeks = [];
+  const currentWeekStart = startOfWeek(today, { weekStartsOn: 1 });
+  let sumPlanned = 0;
+  let sumCompleted = 0;
+
+  for (let i = 7; i >= 0; i--) {
+    const weekStart = subWeeks(currentWeekStart, i);
+    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+    const weekLabel = `W${format(weekStart, 'w')} ${format(weekStart, 'MMM')}`;
+    const rangeLabel = `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d')}`;
+
+    const weekTasks = safeTasks.filter((t) => {
+      if (!t || !t.date) return false;
+      try {
+        const td = parseISO(t.date);
+        return td >= weekStart && td <= weekEnd;
+      } catch {
+        return false;
+      }
+    });
+
+    const completedInStore = weekTasks.filter((t) => t.status === 'Done').length;
+    let hours = 0;
+    let logTasksDone = 0;
+
+    safeLogs.forEach((l) => {
+      if (!l || !l.date) return;
+      try {
+        const ld = parseISO(l.date);
+        if (ld >= weekStart && ld <= weekEnd) {
+          hours += getGenuineLogHours(l);
+          logTasksDone += Number(l.tasksCompleted) || 0;
+        }
+      } catch {}
+    });
+
+    const completed = Math.max(completedInStore, logTasksDone);
+    const planned = Math.max(weekTasks.length, completed);
+
+    sumPlanned += planned;
+    sumCompleted += completed;
+
+    const rate = planned > 0 ? Math.round((completed / planned) * 100) : (completed > 0 ? 100 : 0);
+
+    weeks.push({
+      label: weekLabel,
+      range: rangeLabel,
+      planned,
+      completed,
+      rate,
+      hours: Number(hours.toFixed(1)),
+      isCurrent: i === 0,
+    });
+  }
+
+  const overallRate = sumPlanned > 0 ? Math.round((sumCompleted / sumPlanned) * 100) : 0;
+
+  return {
+    data: weeks,
+    totalPlanned: sumPlanned,
+    totalCompleted: sumCompleted,
+    overallRate,
+    currentRate: weeks[weeks.length - 1]?.rate || 0,
   };
 };

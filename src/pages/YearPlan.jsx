@@ -1,35 +1,96 @@
 import React, { useState } from 'react';
-import { Target, Flag, CheckCircle2, Trophy, Plus, Sparkles, BookOpen, Edit3, X, Check } from 'lucide-react';
+import { Edit3, X } from 'lucide-react';
+import { parseISO } from 'date-fns';
 import { useTaskStore } from '../store/useTaskStore';
 import { soundManager } from '../utils/audio';
 import { triggerConfetti } from '../utils/confetti';
+import { getGenuineLogHours } from '../utils/studyStats';
 
 export default function YearPlan() {
-  const { yearlyPlan, updateMonthPlan } = useTaskStore();
+  const { yearlyPlan, updateMonthPlan, timerLogs } = useTaskStore();
   const months = yearlyPlan || [];
 
   const [editingMonth, setEditingMonth] = useState(null);
   const [modalForm, setModalForm] = useState({
     milestone: '',
-    targetHours: 140,
+    targetHours: 120,
     loggedHours: 0,
     progress: 0,
     status: 'Upcoming',
   });
 
+  // Calculate genuine logged hours for a specific month
+  const getMonthLoggedHours = (m) => {
+    if (!m) return 0;
+    const explicit = Number(m.loggedHours) || 0;
+    const progress = Number(m.progress) || 0;
+    const target = Number(m.targetHours) || 120;
+    const fromProgress = progress > 0 ? Math.round(target * (progress / 100)) : 0;
+
+    // Any actual timer study hours logged in timerLogs for that month
+    let timerHours = 0;
+    if (Array.isArray(timerLogs)) {
+      timerLogs.forEach((l) => {
+        if (!l || !l.date) return;
+        try {
+          const d = parseISO(l.date);
+          if (d.getMonth() + 1 === m.id) {
+            timerHours += getGenuineLogHours(l);
+          }
+        } catch {}
+      });
+    }
+
+    return Math.max(explicit, fromProgress, Math.round(timerHours));
+  };
+
   const completedMonths = months.filter((m) => m.status === 'Completed').length;
-  const totalTargetHours = months.reduce((a, b) => a + (Number(b.targetHours) || 0), 0);
-  const totalLoggedHours = months.reduce((a, b) => a + (Number(b.loggedHours) || 0), 0);
+  const totalLoggedHours = months.reduce((sum, m) => sum + getMonthLoggedHours(m), 0);
 
   const openEditModal = (month) => {
     setEditingMonth(month);
+    const initialLogged = getMonthLoggedHours(month);
     setModalForm({
       milestone: month.milestone || '',
-      targetHours: month.targetHours || 140,
-      loggedHours: month.loggedHours || 0,
-      progress: month.progress || 0,
+      targetHours: Number(month.targetHours) || 120,
+      loggedHours: initialLogged,
+      progress: Number(month.progress) || 0,
       status: month.status || 'Upcoming',
     });
+  };
+
+  const handleProgressChange = (newProgress) => {
+    const p = Math.max(0, Math.min(100, Number(newProgress)));
+    const target = Number(modalForm.targetHours) || 120;
+    const computedHours = Math.round(target * (p / 100));
+    setModalForm((prev) => ({
+      ...prev,
+      progress: p,
+      loggedHours: computedHours,
+      status: p >= 100 ? 'Completed' : p > 0 ? 'In Progress' : 'Upcoming',
+    }));
+  };
+
+  const handleLoggedHoursChange = (newHours) => {
+    const h = Math.max(0, Number(newHours));
+    const target = Number(modalForm.targetHours) || 120;
+    const computedProgress = Math.min(100, Math.round((h / target) * 100));
+    setModalForm((prev) => ({
+      ...prev,
+      loggedHours: h,
+      progress: computedProgress,
+      status: computedProgress >= 100 ? 'Completed' : computedProgress > 0 ? 'In Progress' : 'Upcoming',
+    }));
+  };
+
+  const handleTargetHoursChange = (newTarget) => {
+    const t = Math.max(1, Number(newTarget));
+    const computedHours = Math.round(t * (Number(modalForm.progress) / 100));
+    setModalForm((prev) => ({
+      ...prev,
+      targetHours: t,
+      loggedHours: computedHours,
+    }));
   };
 
   const handleSave = (e) => {
@@ -56,22 +117,15 @@ export default function YearPlan() {
 
   return (
     <div className="space-y-6">
-      {/* Yearly Overview Card (Square-type) */}
+      {/* Yearly Overview Card */}
       <div className="clay-card p-5 sm:p-6 shadow-neu-card flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-2 text-center md:text-left">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-brand-purple/20 text-brand-purple text-xs font-bold">
-            <Trophy className="w-3.5 h-3.5" />
-            <span>Academic Roadmap 2026-2027</span>
-          </div>
+        <div className="text-center md:text-left">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">
             12-Month Master Strategy
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-lg">
-            High-level curriculum roadmap, monthly milestone goals, and total study hours progress bar. Click any month card to edit!
-          </p>
         </div>
 
-        {/* Big Year Stats (Square-type insets) */}
+        {/* Big Year Stats */}
         <div className="flex items-center justify-center gap-3 w-full md:w-auto shrink-0">
           <div className="text-center p-3 rounded-xl neu-inset min-w-[90px] flex-1 sm:flex-none">
             <span className="text-xl font-black text-brand-teal">{completedMonths}/12</span>
@@ -85,20 +139,19 @@ export default function YearPlan() {
         </div>
       </div>
 
-      {/* 12-Month Grid (Square-type cards) */}
+      {/* 12-Month Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {months.map((m) => {
           const isDone = m.status === 'Completed';
           const isInProgress = m.status === 'In Progress';
+          const effectiveHours = getMonthLoggedHours(m);
 
           return (
             <div
               key={m.id}
               onClick={() => openEditModal(m)}
               className={`clay-card p-4 rounded-xl flex flex-col justify-between transition-all duration-200 cursor-pointer group hover:-translate-y-1 hover:shadow-lg ${
-                isInProgress
-                  ? 'ring-2 ring-brand-teal shadow-xl'
-                  : ''
+                isInProgress ? 'ring-2 ring-brand-teal shadow-xl' : ''
               }`}
             >
               <div>
@@ -156,8 +209,10 @@ export default function YearPlan() {
                 </div>
 
                 <div className="flex items-center justify-between text-[10px] text-slate-500 font-semibold pt-1">
-                  <span>Target: {m.targetHours}h</span>
-                  <span>Logged: {m.loggedHours}h</span>
+                  <span>Target: {m.targetHours || 120}h</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-200">
+                    Logged: {effectiveHours}h
+                  </span>
                 </div>
               </div>
             </div>
@@ -174,7 +229,6 @@ export default function YearPlan() {
                 <h3 className="text-base font-bold text-slate-800 dark:text-white">
                   Edit {editingMonth.name} Plan
                 </h3>
-                <p className="text-xs text-slate-500">Update curriculum milestones & target study hours</p>
               </div>
               <button
                 onClick={() => setEditingMonth(null)}
@@ -206,9 +260,9 @@ export default function YearPlan() {
                   </label>
                   <input
                     type="number"
-                    min="0"
+                    min="1"
                     value={modalForm.targetHours}
-                    onChange={(e) => setModalForm({ ...modalForm, targetHours: Number(e.target.value) })}
+                    onChange={(e) => handleTargetHoursChange(e.target.value)}
                     className="w-full px-3.5 py-2 rounded-xl neu-inset border border-white/60 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none"
                   />
                 </div>
@@ -221,7 +275,7 @@ export default function YearPlan() {
                     type="number"
                     min="0"
                     value={modalForm.loggedHours}
-                    onChange={(e) => setModalForm({ ...modalForm, loggedHours: Number(e.target.value) })}
+                    onChange={(e) => handleLoggedHoursChange(e.target.value)}
                     className="w-full px-3.5 py-2 rounded-xl neu-inset border border-white/60 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none"
                   />
                 </div>
@@ -237,7 +291,7 @@ export default function YearPlan() {
                     min="0"
                     max="100"
                     value={modalForm.progress}
-                    onChange={(e) => setModalForm({ ...modalForm, progress: Number(e.target.value) })}
+                    onChange={(e) => handleProgressChange(e.target.value)}
                     className="w-full accent-brand-teal mt-2"
                   />
                 </div>
@@ -263,38 +317,49 @@ export default function YearPlan() {
                 <span className="text-[10px] font-bold text-slate-400 mr-1">Quick:</span>
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
+                    const target = Number(modalForm.targetHours) || 120;
+                    const newHours = Number(modalForm.loggedHours) + 10;
+                    const newProg = Math.min(100, Math.round((newHours / target) * 100));
                     setModalForm((prev) => ({
                       ...prev,
-                      loggedHours: prev.loggedHours + 10,
-                    }))
-                  }
+                      loggedHours: newHours,
+                      progress: newProg,
+                      status: newProg >= 100 ? 'Completed' : 'In Progress',
+                    }));
+                  }}
                   className="px-2 py-0.5 rounded-md neu-pill-btn text-[10px] font-bold text-slate-700 dark:text-slate-300"
                 >
                   +10h
                 </button>
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
+                    const target = Number(modalForm.targetHours) || 120;
+                    const newProg = Math.min(100, Number(modalForm.progress) + 25);
+                    const newHours = Math.round(target * (newProg / 100));
                     setModalForm((prev) => ({
                       ...prev,
-                      progress: Math.min(100, prev.progress + 25),
-                      status: prev.progress + 25 >= 100 ? 'Completed' : 'In Progress',
-                    }))
-                  }
+                      progress: newProg,
+                      loggedHours: newHours,
+                      status: newProg >= 100 ? 'Completed' : 'In Progress',
+                    }));
+                  }}
                   className="px-2 py-0.5 rounded-md neu-pill-btn text-[10px] font-bold text-slate-700 dark:text-slate-300"
                 >
                   +25%
                 </button>
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
+                    const target = Number(modalForm.targetHours) || 120;
                     setModalForm((prev) => ({
                       ...prev,
                       progress: 100,
+                      loggedHours: target,
                       status: 'Completed',
-                    }))
-                  }
+                    }));
+                  }}
                   className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold hover:bg-emerald-500/30"
                 >
                   Mark 100% Done

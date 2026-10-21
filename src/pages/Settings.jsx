@@ -7,7 +7,12 @@ import {
   RotateCcw, 
   ShieldCheck, 
   CheckCircle2, 
-  AlertTriangle 
+  AlertTriangle,
+  Camera,
+  Trash2,
+  Sparkles,
+  UploadCloud,
+  ExternalLink
 } from 'lucide-react';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useTaskStore } from '../store/useTaskStore';
@@ -30,10 +35,91 @@ export default function Settings() {
   const { exportDataJSON, importDataJSON, resetAllData } = useTaskStore();
 
   const fileInputRef = useRef(null);
+  const avatarInputRef = useRef(null);
   const [profileName, setProfileName] = useState(userName);
   const [profileMotto, setProfileMotto] = useState(userMotto);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Client-side image processor for avatar upload
+  const processImageFile = (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setFeedbackMsg('Please select a valid image file (PNG, JPG, WebP)');
+      setTimeout(() => setFeedbackMsg(''), 3000);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Resize to 320x320 max for high visual quality and minimal localStorage footprint
+        const canvas = document.createElement('canvas');
+        const maxDim = 320;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+        updateProfile({ userAvatar: compressedDataUrl });
+        setFeedbackMsg('Profile photo uploaded successfully! 📸✨');
+        setTimeout(() => setFeedbackMsg(''), 3000);
+      };
+      img.src = e.target?.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAvatarFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processImageFile(file);
+    }
+    e.target.value = '';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processImageFile(file);
+    }
+  };
+
+  const handleResetAvatar = () => {
+    updateProfile({ userAvatar: '/assets/student_avatar.jpg' });
+    setFeedbackMsg('Avatar reset to default! ✨');
+    setTimeout(() => setFeedbackMsg(''), 3000);
+  };
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
@@ -69,22 +155,28 @@ export default function Settings() {
     setTimeout(() => setFeedbackMsg(''), 3000);
   };
 
+  const isCustomUploadedAvatar = userAvatar && !AVATAR_OPTIONS.some((a) => a.path === userAvatar);
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="clay-card p-6 flex items-center justify-between">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300">
-            <SettingsIcon className="w-3.5 h-3.5" />
-            <span>Preferences & Data Management</span>
-          </div>
+        <div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">
             App Settings
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Customize your persona and export/import offline backups.
-          </p>
         </div>
+
+        <a
+          href="https://laxmidharlhs974.github.io/my-website-LHS/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600/10 via-indigo-500/15 to-violet-500/10 dark:from-blue-500/20 dark:via-indigo-500/20 dark:to-violet-500/20 hover:from-blue-600/20 hover:via-indigo-500/25 hover:to-violet-500/20 border border-indigo-200/60 dark:border-indigo-500/40 hover:border-indigo-400 dark:hover:border-indigo-400 shadow-sm hover:shadow-md text-xs sm:text-sm font-extrabold text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-white flex items-center gap-1.5 tracking-wide transition-all duration-200 active:scale-95 cursor-pointer"
+          title="Visit LHS Website"
+        >
+          <span>Build by LHS 🦅</span>
+          <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+        </a>
       </div>
 
       {/* Feedback Alert */}
@@ -95,77 +187,170 @@ export default function Settings() {
         </div>
       )}
 
-      {/* 1. Profile Customization */}
-      <div className="clay-card p-4 sm:p-6 space-y-5">
-        <h3 className="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">
-          <User className="w-4 h-4 text-brand-teal" />
-          <span>Profile & Persona</span>
-        </h3>
+      {/* 1. Redesigned Profile & Persona with Upload Function */}
+      <div className="clay-card p-4 sm:p-7 space-y-6 relative overflow-hidden">
+        {/* Ambient background blur */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-teal/5 dark:bg-brand-teal/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Avatar Selection */}
-        <div>
-          <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">
-            Select 3D Clay Avatar
+        <div className="flex items-center justify-between">
+          <h3 className="text-base sm:text-lg font-extrabold text-slate-800 dark:text-white flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20">
+              <User className="w-4 h-4" />
+            </div>
+            <span>Profile & Persona</span>
+          </h3>
+
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-teal-500/15 text-teal-600 dark:text-teal-300 border border-teal-500/30">
+            Active Student
+          </span>
+        </div>
+
+        {/* Profile Card Main Layout: Avatar Uploader on Left, Details on Right */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+          {/* Avatar Upload Container */}
+          <div className="md:col-span-5 flex flex-col items-center text-center p-4 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 shadow-sm">
+            {/* Hidden file input */}
+            <input
+              type="file"
+              ref={avatarInputRef}
+              onChange={handleAvatarFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+
+            {/* Interactive Avatar Frame with Drag & Drop */}
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => avatarInputRef.current?.click()}
+              className={`relative group cursor-pointer w-28 h-28 sm:w-32 sm:h-32 rounded-3xl p-1.5 transition-all duration-300 ${
+                isDragging
+                  ? 'ring-4 ring-brand-teal scale-105 bg-brand-teal/20'
+                  : 'bg-gradient-to-tr from-teal-400 via-indigo-500 to-purple-600 shadow-lg hover:shadow-xl hover:scale-102'
+              }`}
+            >
+              <div className="w-full h-full rounded-2xl overflow-hidden bg-slate-900 relative">
+                <img
+                  src={userAvatar || '/assets/student_avatar.jpg'}
+                  alt={userName}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+
+                {/* Hover overlay with Camera icon */}
+                <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-white">
+                  <Camera className="w-6 h-6 text-teal-300" />
+                  <span className="text-[10px] font-bold tracking-wide">Upload Photo</span>
+                </div>
+              </div>
+
+              {/* Camera icon badge */}
+              <div className="absolute -bottom-1 -right-1 p-2 rounded-xl bg-teal-500 text-white shadow-md border-2 border-white dark:border-slate-800 group-hover:scale-110 transition-transform">
+                <Camera className="w-3.5 h-3.5" />
+              </div>
+            </div>
+
+            {/* Upload Buttons */}
+            <div className="w-full mt-4 space-y-2">
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                className="w-full py-2 px-3 rounded-xl neu-teal-btn text-xs font-bold flex items-center justify-center gap-2 shadow"
+              >
+                <UploadCloud className="w-4 h-4" />
+                <span>Upload New Photo</span>
+              </button>
+
+              {isCustomUploadedAvatar && (
+                <button
+                  type="button"
+                  onClick={handleResetAvatar}
+                  className="w-full py-1.5 px-3 rounded-xl text-slate-500 hover:text-red-500 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Remove Custom Photo</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Form: Name & Motto */}
+          <div className="md:col-span-7 flex flex-col justify-between h-full">
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-teal-500" />
+                  <span>Your Name</span>
+                </label>
+                <input
+                  type="text"
+                  value={profileName}
+                  onChange={(e) => setProfileName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="w-full px-4 py-2.5 rounded-xl neu-inset border border-slate-200/80 dark:border-slate-700/80 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Focus Motto / Tagline</span>
+                </label>
+                <input
+                  type="text"
+                  value={profileMotto}
+                  onChange={(e) => setProfileMotto(e.target.value)}
+                  placeholder="e.g. Building high focus, one sprint at a time"
+                  className="w-full px-4 py-2.5 rounded-xl neu-inset border border-slate-200/80 dark:border-slate-700/80 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button 
+                  type="submit" 
+                  className="neu-teal-btn px-6 py-2.5 text-xs font-extrabold shadow flex items-center justify-center gap-2 w-full sm:w-auto"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Save Profile</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* 3D Clay Avatar Preset Switcher */}
+        <div className="pt-4 border-t border-slate-200/60 dark:border-slate-700/60">
+          <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-3">
+            Or choose a 3D Avatar character
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
             {AVATAR_OPTIONS.map((av) => (
               <button
                 key={av.id}
                 type="button"
-                onClick={() => updateProfile({ userAvatar: av.path })}
-                className={`p-2.5 rounded-2xl flex flex-col items-center gap-2 transition-all border ${
+                onClick={() => {
+                  updateProfile({ userAvatar: av.path });
+                  setFeedbackMsg(`Switched avatar to ${av.name}! ✨`);
+                  setTimeout(() => setFeedbackMsg(''), 3000);
+                }}
+                className={`p-2.5 rounded-2xl flex items-center gap-3 transition-all border text-left ${
                   userAvatar === av.path
-                    ? 'ring-2 ring-brand-teal bg-brand-teal/10 border-brand-teal'
-                    : 'neu-inset border-transparent hover:border-slate-400'
+                    ? 'ring-2 ring-teal-500 bg-teal-500/10 border-teal-500 shadow-sm'
+                    : 'bg-white/40 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-700/60 hover:border-teal-400'
                 }`}
               >
                 <img
                   src={av.path}
                   alt={av.name}
-                  className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-full shadow"
+                  className="w-10 h-10 object-cover rounded-xl shadow shrink-0"
                 />
-                <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 truncate w-full text-center">
+                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 truncate">
                   {av.name}
                 </span>
               </button>
             ))}
           </div>
         </div>
-
-        {/* Name and Motto Form */}
-        <form onSubmit={handleSaveProfile} className="space-y-4 pt-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Your Name
-              </label>
-              <input
-                type="text"
-                value={profileName}
-                onChange={(e) => setProfileName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Focus Motto / Tagline
-              </label>
-              <input
-                type="text"
-                value={profileMotto}
-                onChange={(e) => setProfileMotto(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            <button type="submit" className="neu-teal-btn px-5 py-2 text-xs font-bold shadow w-full sm:w-auto">
-              Save Profile
-            </button>
-          </div>
-        </form>
       </div>
 
       {/* 2. Local Storage Backup & Data Reset */}
@@ -174,11 +359,6 @@ export default function Settings() {
           <ShieldCheck className="w-4 h-4 text-emerald-500" />
           <span>Local Storage & Backup (Offline First)</span>
         </h3>
-        <p className="text-xs text-slate-500 leading-relaxed">
-          All your tasks, routines, subjects, study logs, and streaks are safely cached in localStorage
-          under key <code className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 font-mono">build-lhs-v1</code>.
-          You can download a JSON backup anytime or restore it.
-        </p>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-2">
           {/* Export JSON */}

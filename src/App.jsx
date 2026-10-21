@@ -57,7 +57,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="relative min-h-screen bg-gradient-to-br from-[#dce7f2] via-[#eaf1f8] to-[#d8e5f2] dark:from-[#0b101c] dark:via-[#0e1627] dark:to-[#080d18] text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-500 overflow-x-hidden">
+      <div className="relative min-h-screen bg-gradient-to-br from-[#dce7f2] via-[#eaf1f8] to-[#d8e5f2] dark:from-[#0b101c] dark:via-[#0e1627] dark:to-[#080d18] text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-500 overflow-x-clip">
         {/* Liquid Ambient Glowing Mesh Orbs (Fixed in background for realistic glass refraction) */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
           <div className="absolute -top-32 -left-32 w-96 h-96 sm:w-[540px] sm:h-[540px] rounded-full bg-brand-teal/20 dark:bg-brand-teal/15 blur-[120px] sm:blur-[150px] animate-pulse" />

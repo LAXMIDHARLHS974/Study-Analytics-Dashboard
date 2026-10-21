@@ -44,7 +44,6 @@ export default function WeekPlan({ onOpenNewTask, onEditTask }) {
             <h2 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white">
               {format(weekStart, 'MMM d')} – {format(weekEnd, 'MMM d, yyyy')}
             </h2>
-            <p className="text-xs text-slate-500">7-Day Square Column Board</p>
           </div>
         </div>
 

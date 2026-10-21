@@ -6,12 +6,10 @@ import {
   SkipForward, 
   Volume2, 
   VolumeX, 
-  Sparkles, 
-  Coffee, 
-  BrainCircuit, 
   CheckCircle2,
   CloudRain,
-  Wind
+  Wind,
+  Sparkles
 } from 'lucide-react';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useTaskStore } from '../store/useTaskStore';
@@ -156,17 +154,10 @@ export default function TimerPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Top Banner */}
-      <div className="clay-card p-6 text-center space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-teal/20 text-brand-teal text-xs font-bold">
-          <BrainCircuit className="w-3.5 h-3.5" />
-          <span>Active Focus Mode</span>
-        </div>
+      <div className="clay-card p-6 text-center">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">
           Pomodoro Study Sprint
         </h2>
-        <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-          Deep work blocks with synthesized soundscapes. Time spent automatically counts toward your subject targets and streak!
-        </p>
       </div>
 
       {/* Main Timer Dial Card */}
@@ -393,10 +384,6 @@ export default function TimerPage() {
               <span>White Noise</span>
             </button>
           </div>
-
-          <p className="text-[11px] text-slate-500">
-            Synthesized live with Web Audio API. Zero streaming lag, works completely offline!
-          </p>
         </div>
       </div>
     </div>

@@ -147,17 +147,10 @@ export default function DailyRoutine() {
     <div className="space-y-6">
       {/* Header Card */}
       <div className="clay-card p-5 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="space-y-1 text-center md:text-left">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-brand-teal/20 text-brand-teal text-xs font-bold">
-            <Layers className="w-3.5 h-3.5" />
-            <span>Editable Routine Engine</span>
-          </div>
+        <div className="text-center md:text-left">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">
             Daily Routine Builder
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Create, edit, and fine-tune your schedule templates. Apply anytime to Today or Tomorrow.
-          </p>
         </div>
 
         {/* Template Selector & New Template Button */}
@@ -239,7 +232,6 @@ export default function DailyRoutine() {
                   </button>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mt-1">{activeRoutine.description}</p>
             </div>
 
             {/* Quick Apply & Add Block Buttons */}

@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  BookMarked, 
+  BookMarked,
   Plus, 
   Clock, 
-  CheckCircle2, 
   Play, 
-  Trash2, 
-  Edit3,
-  Layers,
-  Sparkles
+  Trash2
 } from 'lucide-react';
 import { useTaskStore } from '../store/useTaskStore';
 import { useSettingsStore } from '../store/useSettingsStore';
@@ -63,17 +59,10 @@ export default function Subjects() {
     <div className="space-y-6">
       {/* Header */}
       <div className="clay-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="space-y-1 text-center sm:text-left">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-blue/20 text-brand-blue text-xs font-bold">
-            <BookMarked className="w-3.5 h-3.5" />
-            <span>Curriculum Intelligence</span>
-          </div>
+        <div className="text-center sm:text-left">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">
-            Subjects & Syllabus Progress
+            Subjects
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Track weekly study targets, chapter completion, and launch subject focus sessions.
-          </p>
         </div>
 
         <button
@@ -125,30 +114,6 @@ export default function Subjects() {
                   <h3 className="text-lg font-extrabold text-slate-800 dark:text-white tracking-tight">
                     {subj.name}
                   </h3>
-
-                  {/* Syllabus Progress */}
-                  <div className="mt-4 space-y-1.5">
-                    <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
-                      <span>Syllabus Completion</span>
-                      <span className="text-slate-800 dark:text-white font-extrabold">
-                        {subj.syllabusProgress}%
-                      </span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${subj.syllabusProgress}%`,
-                          backgroundColor: subj.color,
-                        }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium">
-                      <span>
-                        {subj.completedChapters || 0} / {subj.totalChapters || 10} chapters done
-                      </span>
-                    </div>
-                  </div>
 
                   {/* Weekly Hours Target */}
                   <div className="mt-4 p-3 rounded-2xl neu-inset space-y-1.5">
@@ -267,36 +232,19 @@ export default function Subjects() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Target Hours/Week
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={newSubj.targetHoursWeekly}
-                    onChange={(e) =>
-                      setNewSubj({ ...newSubj, targetHoursWeekly: Number(e.target.value) })
-                    }
-                    className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Total Chapters
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={newSubj.totalChapters}
-                    onChange={(e) =>
-                      setNewSubj({ ...newSubj, totalChapters: Number(e.target.value) })
-                    }
-                    className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Target Hours/Week
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={newSubj.targetHoursWeekly}
+                  onChange={(e) =>
+                    setNewSubj({ ...newSubj, targetHoursWeekly: Number(e.target.value) })
+                  }
+                  className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none"
+                />
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-300/40 dark:border-slate-700/60">

@@ -26,6 +26,7 @@ import {
   Check,
   TrendingUp,
   Edit3,
+  Trash2,
   CalendarDays
 } from 'lucide-react';
 import { useTaskStore } from '../store/useTaskStore';
@@ -37,7 +38,7 @@ import { triggerConfetti } from '../utils/confetti';
 
 export default function Today({ onOpenNewTask, onEditTask }) {
   const navigate = useNavigate();
-  const { tasks, subjects, routines, applyRoutineToDate, toggleTaskStatus } = useTaskStore();
+  const { tasks, subjects, routines, applyRoutineToDate, toggleTaskStatus, deleteTask } = useTaskStore();
   const { setTimerState } = useSettingsStore();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -510,6 +511,14 @@ export default function Today({ onOpenNewTask, onEditTask }) {
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
+
+                        <button
+                          onClick={() => deleteTask(task.id)}
+                          className="p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                          title="Delete task"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   );
@@ -570,13 +579,39 @@ export default function Today({ onOpenNewTask, onEditTask }) {
                         {hourTasks.map((t) => (
                           <div
                             key={t.id}
-                            onClick={() => onEditTask?.(t)}
-                            className="p-1.5 rounded-lg bg-white/80 dark:bg-[#0E1636]/80 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between cursor-pointer hover:border-violet-500/40 hover:shadow-glass-card transition-all"
+                            className="p-1.5 rounded-lg bg-white/80 dark:bg-[#0E1636]/80 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between hover:border-violet-500/40 hover:shadow-glass-card transition-all"
                           >
-                            <span className="truncate">{t.title}</span>
-                            <span className="text-[10px] text-royal-600 dark:text-royal-300 font-semibold shrink-0 ml-2">
-                              {t.duration || 60}m
+                            <span 
+                              onClick={() => onEditTask?.(t)}
+                              className="truncate cursor-pointer hover:underline flex-1"
+                            >
+                              {t.title}
                             </span>
+                            <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                              <span className="text-[10px] text-royal-600 dark:text-royal-300 font-semibold">
+                                {t.duration || 60}m
+                              </span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onEditTask?.(t);
+                                }}
+                                className="p-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors"
+                                title="Edit"
+                              >
+                                <Edit3 className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteTask(t.id);
+                                }}
+                                className="p-0.5 text-slate-400 hover:text-rose-500 transition-colors"
+                                title="Delete task"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>

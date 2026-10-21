@@ -96,7 +96,7 @@ Recreated with pixel-crafted fidelity from the 3D claymorphic music dashboard st
 - **Export Backup (JSON)**: Download your entire planner state.
 - **Import Backup (JSON)**: Restore tasks and routines from file.
 - **Reset All Data**: Reset to default rich seed data anytime.
-- Keyboard shortcuts: `[N]` for New Task, `[/]` for Search.
+- Keyboard shortcuts: `[N]` for New Task.
 
 ---
 

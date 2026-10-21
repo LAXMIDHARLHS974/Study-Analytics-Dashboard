@@ -17,7 +17,7 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/today', label: 'Today', icon: Clock },
+  { path: '/today', label: 'Today', icon: Clock, hideOnMobile: true },
   { path: '/week', label: 'Weekly Plan', icon: CalendarDays },
   { path: '/month', label: 'Monthly Plan', icon: CalendarRange },
   { path: '/year', label: 'Yearly Plan', icon: Target },
@@ -70,9 +70,6 @@ export default function Sidebar({ isOpen, onClose }) {
           <span>Hi, {userName}!</span>
           <span className="text-amber-500 dark:text-violet-400 text-xs sm:text-sm">✨</span>
         </h2>
-        <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate max-w-[170px] sm:max-w-[220px]">
-          {userMotto || 'Stay Focused & Consistent'}
-        </p>
       </div>
 
       {/* Navigation List with High-Contrast Liquid Glass States */}

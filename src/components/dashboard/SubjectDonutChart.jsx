@@ -58,9 +58,6 @@ export default function SubjectDonutChart() {
             <PieIcon className="w-4 h-4 text-brand-teal" />
             <span>Subject Distribution</span>
           </h3>
-          <p className="text-[11px] text-slate-500">
-            Study time logged per subject
-          </p>
         </div>
 
         {/* Time Filter Select */}

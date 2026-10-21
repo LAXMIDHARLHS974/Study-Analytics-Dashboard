@@ -34,17 +34,10 @@ export default function Goals() {
     <div className="space-y-6">
       {/* Header */}
       <div className="clay-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="space-y-1 text-center sm:text-left">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-teal/20 text-brand-teal text-xs font-bold">
-            <Target className="w-3.5 h-3.5" />
-            <span>North Star Metrics</span>
-          </div>
+        <div className="text-center sm:text-left">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">
             Academic & Long-Term Goals
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Define high-impact milestones and tie your daily study tasks to big achievements.
-          </p>
         </div>
 
         <button

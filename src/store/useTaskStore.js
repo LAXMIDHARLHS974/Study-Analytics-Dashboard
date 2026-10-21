@@ -85,11 +85,31 @@ export const sanitizeStoreState = (rawState) => {
     });
   }
 
+  // Ensure completed/progressed yearly plan months reflect genuine logged hours
+  let cleanYearlyPlan = rawState.yearlyPlan;
+  if (Array.isArray(cleanYearlyPlan)) {
+    cleanYearlyPlan = cleanYearlyPlan.map((m) => {
+      if (!m) return m;
+      let logged = Number(m.loggedHours) || 0;
+      const progress = Number(m.progress) || 0;
+      const target = Number(m.targetHours) || 120;
+      if (logged === 0 && progress > 0) {
+        logged = Math.round(target * (progress / 100));
+      }
+      return {
+        ...m,
+        targetHours: target,
+        loggedHours: logged,
+      };
+    });
+  }
+
   return {
     ...rawState,
     subjects: cleanSubjects,
     tasks: cleanTasks,
     timerLogs: cleanLogs,
+    yearlyPlan: cleanYearlyPlan || rawState.yearlyPlan,
   };
 };
 
@@ -122,14 +142,12 @@ export const useTaskStore = create(
       yearlyPlan: INITIAL_MONTHS_PLAN,
       
       // Filter & UI states
-      searchQuery: '',
       filterSubject: 'all',
       filterPriority: 'all',
       filterStatus: 'all',
       sortBy: 'time', // 'time' | 'priority' | 'title' | 'duration'
 
       // Actions for filters
-      setSearchQuery: (query) => set({ searchQuery: query }),
       setFilterSubject: (subject) => set({ filterSubject: subject }),
       setFilterPriority: (priority) => set({ filterPriority: priority }),
       setFilterStatus: (status) => set({ filterStatus: status }),

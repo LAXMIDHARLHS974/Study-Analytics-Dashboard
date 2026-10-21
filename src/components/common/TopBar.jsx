@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  Search,
   Bell,
   Plus,
   Sun,
   Moon,
   Menu,
-  Timer,
   AlertCircle,
   Check,
   CheckCheck,
@@ -21,13 +19,11 @@ import { formatTo12Hour } from '../../utils/timeFormat';
 export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const searchInputRef = useRef(null);
 
-  const { theme, toggleTheme, userName, userAvatar, isTimerRunning, timerSecondsLeft, readNotificationIds, markAllNotificationsAsRead } = useSettingsStore();
-  const { searchQuery, setSearchQuery, tasks } = useTaskStore();
+  const { theme, toggleTheme, userName, userAvatar, readNotificationIds, markAllNotificationsAsRead } = useSettingsStore();
+  const { tasks } = useTaskStore();
 
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const notifRef = useRef(null);
 
   // Compute overdue and due today tasks
@@ -57,7 +53,7 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
       case '/month': return 'Monthly Calendar';
       case '/year': return 'Yearly Roadmaps';
       case '/routine': return 'Daily Routine';
-      case '/subjects': return 'Subjects & Syllabus';
+      case '/subjects': return 'Subjects';
       case '/goals': return 'Academic Goals';
       case '/timer': return 'Pomodoro Timer';
       case '/analytics': return 'Study Analytics';
@@ -66,15 +62,12 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
     }
   };
 
-  // Keyboard shortcut: Pressing '/' focuses search, 'N' opens new task
+  // Keyboard shortcut: Pressing 'N' opens new task
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-      if (e.key === '/') {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-      } else if (e.key.toLowerCase() === 'n' && !e.metaKey && !e.ctrlKey) {
+      if (e.key.toLowerCase() === 'n' && !e.metaKey && !e.ctrlKey) {
         e.preventDefault();
         onOpenNewTask();
       }
@@ -94,14 +87,9 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const formatTimerMinSec = (totalSeconds) => {
-    const m = Math.floor(totalSeconds / 60);
-    const s = totalSeconds % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
 
   return (
-    <header className="px-3 sm:px-4 lg:px-8 pt-3 sm:pt-4 pb-2 sm:pb-3 flex flex-col gap-2">
+    <header className="sticky top-0 z-30 px-3 sm:px-4 lg:px-8 pt-[max(0.625rem,env(safe-area-inset-top,0px))] pb-2 sm:pb-3 bg-white/80 dark:bg-[#0c1424]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] md:static md:bg-transparent md:border-b-0 md:backdrop-blur-none md:shadow-none md:pt-4 transition-all flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Mobile Menu & Page Title */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -118,60 +106,13 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
               {getPageTitle()}
             </h1>
             <p className="text-[11px] sm:text-xs text-slate-400 hidden sm:block truncate">
-              {format(new Date(), 'EEEE, MMMM do, yyyy')} • Let's keep building!
+              {format(new Date(), 'EEEE, MMMM do, yyyy')}
             </p>
           </div>
         </div>
 
         {/* Center & Right Action Items */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {/* Mobile search toggle button */}
-          <button
-            onClick={() => setShowMobileSearch(!showMobileSearch)}
-            aria-label="Toggle Search"
-            className="md:hidden p-2 rounded-full neu-pill-btn text-slate-200"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-
-          {/* Desktop Neumorphic Search Bar */}
-          <div className="relative hidden md:block w-48 lg:w-72">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <Search className="w-4 h-4" />
-            </div>
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search tasks, subjects... [ / ]"
-              className="w-full pl-9 pr-8 py-2 text-xs lg:text-sm font-semibold rounded-full neu-inset border border-slate-300/60 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-royal-500/60 focus:border-royal-400/50 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400/70 transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-
-          {/* Quick Pomodoro Pill (Desktop only - mobile has bottom bar Timer) */}
-          <button
-            onClick={() => navigate('/timer')}
-            className={`hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-md ${isTimerRunning
-                ? 'bg-gradient-to-r from-royal-600 to-violet-neon text-white shadow-[0_0_15px_rgba(139,92,246,0.5)] animate-pulse'
-                : 'neu-pill-btn text-slate-800 dark:text-slate-100 hover:text-royal-600 dark:hover:text-royal-300'
-              }`}
-            title="Open Focus Timer"
-          >
-            <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-royal-600 dark:text-royal-400" />
-            <span className="hidden sm:inline">
-              {isTimerRunning ? formatTimerMinSec(timerSecondsLeft) : '25m Focus'}
-            </span>
-          </button>
-
           {/* Notification Bell with Dropdown */}
           <div className="relative" ref={notifRef}>
             <button
@@ -404,31 +345,6 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
           </button>
         </div>
       </div>
-
-      {/* Expandable Mobile Search Bar */}
-      {showMobileSearch && (
-        <div className="relative md:hidden w-full pt-1 pb-1 animate-in fade-in duration-150">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-            <Search className="w-4 h-4" />
-          </div>
-          <input
-            type="text"
-            autoFocus
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tasks, subjects..."
-            className="w-full pl-9 pr-8 py-2 text-xs font-medium rounded-full neu-inset border border-white/50 dark:border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-brand-teal/50 text-slate-800 dark:text-slate-100 placeholder:text-slate-500/80"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-400"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-      )}
     </header>
   );
 }

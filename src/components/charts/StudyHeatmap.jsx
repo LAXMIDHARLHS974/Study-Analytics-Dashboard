@@ -100,14 +100,23 @@ export default function StudyHeatmap() {
 
         // Subject breakdown
         const subjectsStudied = [];
+        const seenLower = new Set();
         if (log && log.subjectBreakdown) {
           Object.entries(log.subjectBreakdown).forEach(([name, h]) => {
-            if (Number(h) > 0) subjectsStudied.push({ name, hours: Number(h) });
+            const clean = (name || '').trim();
+            const lower = clean.toLowerCase();
+            if (Number(h) > 0 && !seenLower.has(lower)) {
+              seenLower.add(lower);
+              subjectsStudied.push({ name: clean, hours: Number(h) });
+            }
           });
         }
         dayTasks.forEach((t) => {
-          if (t.subject && !subjectsStudied.some((s) => s.name === t.subject)) {
-            subjectsStudied.push({ name: t.subject, isTaskOnly: true });
+          const clean = (t.subject || '').trim();
+          const lower = clean.toLowerCase();
+          if (clean && !seenLower.has(lower)) {
+            seenLower.add(lower);
+            subjectsStudied.push({ name: clean, isTaskOnly: true });
           }
         });
 

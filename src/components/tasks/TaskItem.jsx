@@ -24,7 +24,9 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  const subjectObj = subjects.find((s) => s.id === task.subjectId || s.name === task.subject);
+  const subjectObj = subjects.find(
+    (s) => s.id === task.subjectId || s.name.toLowerCase() === (task.subject || '').trim().toLowerCase()
+  );
   const subjectColor = subjectObj ? subjectObj.color : '#5FB3B3';
 
   useEffect(() => {

@@ -52,7 +52,7 @@ export const useSettingsStore = create(
       timerSecondsLeft: 25 * 60,
       timerMode: 'work', // 'work' | 'shortBreak' | 'longBreak'
       activeTaskId: null,
-      activeSubject: 'Mathematics',
+      activeSubject: 'DSA',
       completedSessionsCount: 0,
 
       // Profile updates
@@ -73,6 +73,10 @@ export const useSettingsStore = create(
           document.documentElement.classList.add('dark');
         } else {
           document.documentElement.classList.remove('dark');
+        }
+        // Purge legacy fake subject default
+        if (state && (state.activeSubject === 'Mathematics' || !state.activeSubject)) {
+          state.activeSubject = 'DSA';
         }
       },
     }

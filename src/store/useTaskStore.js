@@ -10,7 +10,7 @@ import {
   INITIAL_MONTHS_PLAN
 } from '../data/seed';
 
-const FAKE_SUBJECT_NAMES = new Set([
+const LEGACY_DEMO_SUBJECT_NAMES = new Set([
   'mathematics',
   'physics',
   'computer science',
@@ -22,31 +22,61 @@ const FAKE_TASK_IDS = new Set([
   'task-1', 'task-2', 'task-3', 'task-4', 'task-5', 'task-6', 'task-7', 'task-8', 'task-9', 'task-10', 'task-11'
 ]);
 
-// Auto-sanitizer that removes fake demo data while preserving user additions (DSA, English, Backend, JDBC)
+// Auto-sanitizer that removes fake demo data, deduplicates subjects, and canonicalizes task & log subjects
 export const sanitizeStoreState = (rawState) => {
   if (!rawState) return rawState;
   const todayStr = format(new Date(), 'yyyy-MM-dd');
 
-  // Filter out fake subjects
-  let cleanSubjects = (rawState.subjects || []).filter(
-    (s) => s && s.name && !FAKE_SUBJECT_NAMES.has(s.name.trim().toLowerCase())
-  );
+  // Filter out legacy fake subjects and deduplicate remaining subjects case-insensitively
+  const subjectMap = new Map();
+  (rawState.subjects || []).forEach((s) => {
+    if (!s || !s.name) return;
+    const cleanName = s.name.trim();
+    const key = cleanName.toLowerCase();
+    if (LEGACY_DEMO_SUBJECT_NAMES.has(key)) return;
+
+    if (!subjectMap.has(key)) {
+      subjectMap.set(key, { ...s, name: cleanName });
+    } else {
+      // Merge completed weekly hours into the canonical entry
+      const existing = subjectMap.get(key);
+      subjectMap.set(key, {
+        ...existing,
+        completedHoursThisWeek: Number(
+          ((existing.completedHoursThisWeek || 0) + (s.completedHoursThisWeek || 0)).toFixed(1)
+        ),
+      });
+    }
+  });
+
+  let cleanSubjects = Array.from(subjectMap.values());
   if (cleanSubjects.length === 0) {
     cleanSubjects = INITIAL_SUBJECTS;
   }
 
-  // Filter out fake tasks
-  let cleanTasks = (rawState.tasks || []).filter((t) => {
-    if (!t) return false;
-    if (FAKE_TASK_IDS.has(t.id)) return false;
-    if (t.subject && FAKE_SUBJECT_NAMES.has(t.subject.trim().toLowerCase())) return false;
-    return true;
-  });
+  // Filter out fake tasks & normalize task subjects to match canonical subjects
+  let cleanTasks = (rawState.tasks || [])
+    .filter((t) => {
+      if (!t) return false;
+      if (FAKE_TASK_IDS.has(t.id)) return false;
+      if (t.subject && LEGACY_DEMO_SUBJECT_NAMES.has(t.subject.trim().toLowerCase())) return false;
+      return true;
+    })
+    .map((t) => {
+      const match = cleanSubjects.find(
+        (s) => s.id === t.subjectId || s.name.toLowerCase() === (t.subject || '').trim().toLowerCase()
+      );
+      if (match) {
+        return { ...t, subject: match.name, subjectId: match.id };
+      }
+      return t;
+    });
+
   if (cleanTasks.length === 0) {
     cleanTasks = INITIAL_TASKS;
   }
 
-  // Clean timerLogs (strip fake subjects and fake hours)
+  // Clean timerLogs (strip fake subjects and merge duplicate casing keys)
   let cleanLogs = (rawState.timerLogs || [])
     .map((log) => {
       if (!log) return null;
@@ -54,9 +84,13 @@ export const sanitizeStoreState = (rawState) => {
       let cleanHours = 0;
       if (log.subjectBreakdown && typeof log.subjectBreakdown === 'object') {
         Object.entries(log.subjectBreakdown).forEach(([name, hours]) => {
-          if (!FAKE_SUBJECT_NAMES.has(name.trim().toLowerCase())) {
-            cleanBreakdown[name] = hours;
-            cleanHours += Number(hours) || 0;
+          const key = (name || '').trim().toLowerCase();
+          if (!LEGACY_DEMO_SUBJECT_NAMES.has(key)) {
+            const match = cleanSubjects.find((s) => s.name.toLowerCase() === key);
+            const canonicalName = match ? match.name : name.trim();
+            const h = Number(hours) || 0;
+            cleanBreakdown[canonicalName] = Number(((cleanBreakdown[canonicalName] || 0) + h).toFixed(2));
+            cleanHours += h;
           }
         });
       }
@@ -85,6 +119,28 @@ export const sanitizeStoreState = (rawState) => {
     });
   }
 
+  // Ensure routines do not have fake subjects
+  let cleanRoutines = rawState.routines || INITIAL_ROUTINES;
+  if (Array.isArray(cleanRoutines)) {
+    cleanRoutines = cleanRoutines.map((r) => {
+      if (!r || !Array.isArray(r.blocks)) return r;
+      return {
+        ...r,
+        blocks: r.blocks.map((b) => {
+          const lower = (b.subject || '').trim().toLowerCase();
+          if (LEGACY_DEMO_SUBJECT_NAMES.has(lower)) {
+            return { ...b, subject: cleanSubjects[0]?.name || 'DSA' };
+          }
+          const match = cleanSubjects.find((s) => s.name.toLowerCase() === lower);
+          if (match) {
+            return { ...b, subject: match.name };
+          }
+          return b;
+        }),
+      };
+    });
+  }
+
   // Ensure completed/progressed yearly plan months reflect genuine logged hours
   let cleanYearlyPlan = rawState.yearlyPlan;
   if (Array.isArray(cleanYearlyPlan)) {
@@ -108,6 +164,7 @@ export const sanitizeStoreState = (rawState) => {
     ...rawState,
     subjects: cleanSubjects,
     tasks: cleanTasks,
+    routines: cleanRoutines,
     timerLogs: cleanLogs,
     yearlyPlan: cleanYearlyPlan || rawState.yearlyPlan,
   };
@@ -129,6 +186,23 @@ if (typeof window !== 'undefined' && window.localStorage) {
       // ignore
     }
   });
+
+  // Also clean build-lhs-settings-v1 of legacy fake subject defaults
+  try {
+    const settingsItem = window.localStorage.getItem('build-lhs-settings-v1');
+    if (settingsItem) {
+      const parsedSettings = JSON.parse(settingsItem);
+      if (parsedSettings && parsedSettings.state) {
+        const lower = (parsedSettings.state.activeSubject || '').trim().toLowerCase();
+        if (!parsedSettings.state.activeSubject || LEGACY_DEMO_SUBJECT_NAMES.has(lower)) {
+          parsedSettings.state.activeSubject = 'DSA';
+          window.localStorage.setItem('build-lhs-settings-v1', JSON.stringify(parsedSettings));
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
 }
 
 export const useTaskStore = create(
@@ -156,20 +230,33 @@ export const useTaskStore = create(
       // Task actions
       addTask: (newTask) => {
         const id = `task-${Date.now()}`;
-        const subjName = newTask.subject?.trim() || 'General';
+        const rawSubj = (newTask.subject || '').trim();
         let subjId = newTask.subjectId;
 
         let updatedSubjects = [...get().subjects];
-        const existingSubject = updatedSubjects.find(
-          (s) => s.name.toLowerCase() === subjName.toLowerCase()
-        );
+        
+        // Find existing subject by ID or case-insensitive name
+        let existingSubject = null;
+        if (subjId) {
+          existingSubject = updatedSubjects.find((s) => s.id === subjId);
+        }
+        if (!existingSubject && rawSubj) {
+          existingSubject = updatedSubjects.find(
+            (s) => s.name.toLowerCase() === rawSubj.toLowerCase()
+          );
+        }
 
-        if (!existingSubject && subjName !== 'General') {
+        let subjName = rawSubj || 'General';
+
+        if (existingSubject) {
+          subjId = existingSubject.id;
+          subjName = existingSubject.name; // Use canonical existing subject casing
+        } else if (rawSubj && rawSubj.toLowerCase() !== 'general') {
           subjId = `subj-${Date.now()}`;
           const newSubjObj = {
             id: subjId,
-            name: subjName,
-            code: subjName.substring(0, 4).toUpperCase(),
+            name: rawSubj,
+            code: rawSubj.substring(0, 4).toUpperCase(),
             color: '#5FB3B3',
             icon: 'BookOpen',
             targetHoursWeekly: 8,
@@ -179,15 +266,16 @@ export const useTaskStore = create(
             completedChapters: 0,
           };
           updatedSubjects.push(newSubjObj);
-        } else if (existingSubject) {
-          subjId = existingSubject.id;
+        } else {
+          subjName = updatedSubjects[0]?.name || 'General';
+          subjId = updatedSubjects[0]?.id || 'subj-general';
         }
 
         const task = {
           id,
           title: newTask.title || 'Untitled Study Task',
           description: newTask.description || '',
-          subjectId: subjId || 'subj-general',
+          subjectId: subjId,
           subject: subjName,
           date: newTask.date || format(new Date(), 'yyyy-MM-dd'),
           startTime: newTask.startTime || '10:00',
@@ -209,9 +297,22 @@ export const useTaskStore = create(
       },
 
       updateTask: (id, updates) => {
-        set((state) => ({
-          tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)),
-        }));
+        set((state) => {
+          let canonicalUpdates = { ...updates };
+          if (updates.subject || updates.subjectId) {
+            const rawSubj = (updates.subject || '').trim().toLowerCase();
+            const existing = state.subjects.find(
+              (s) => s.id === updates.subjectId || (rawSubj && s.name.toLowerCase() === rawSubj)
+            );
+            if (existing) {
+              canonicalUpdates.subject = existing.name;
+              canonicalUpdates.subjectId = existing.id;
+            }
+          }
+          return {
+            tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...canonicalUpdates } : t)),
+          };
+        });
       },
 
       deleteTask: (id) => {
@@ -276,11 +377,37 @@ export const useTaskStore = create(
 
       // Subject actions
       addSubject: (newSubject) => {
+        const rawName = (newSubject.name || '').trim();
+        if (!rawName) return;
+
+        const currentSubjects = get().subjects;
+        const existing = currentSubjects.find(
+          (s) => s.name.toLowerCase() === rawName.toLowerCase()
+        );
+
+        if (existing) {
+          // Subject with this name already exists: update details instead of duplicating
+          set((state) => ({
+            subjects: state.subjects.map((s) =>
+              s.id === existing.id
+                ? {
+                    ...s,
+                    code: newSubject.code || s.code,
+                    color: newSubject.color || s.color,
+                    targetHoursWeekly: Number(newSubject.targetHoursWeekly) || s.targetHoursWeekly,
+                    totalChapters: Number(newSubject.totalChapters) || s.totalChapters,
+                  }
+                : s
+            ),
+          }));
+          return;
+        }
+
         const id = `subj-${Date.now()}`;
         const subject = {
           id,
-          name: newSubject.name,
-          code: newSubject.code || newSubject.name.substring(0, 4).toUpperCase(),
+          name: rawName,
+          code: newSubject.code || rawName.substring(0, 4).toUpperCase(),
           color: newSubject.color || '#5FB3B3',
           icon: newSubject.icon || 'BookOpen',
           targetHoursWeekly: Number(newSubject.targetHoursWeekly) || 8,
@@ -301,8 +428,13 @@ export const useTaskStore = create(
       },
 
       deleteSubject: (id) => {
+        const target = get().subjects.find((s) => s.id === id);
+        const targetName = target ? target.name.toLowerCase() : '';
         set((state) => ({
           subjects: state.subjects.filter((s) => s.id !== id),
+          tasks: state.tasks.filter(
+            (t) => t.subjectId !== id && (t.subject || '').trim().toLowerCase() !== targetName
+          ),
         }));
       },
 
@@ -371,7 +503,7 @@ export const useTaskStore = create(
           title: newBlock.title || 'Focus Study Block',
           duration: Number(newBlock.duration) || 60,
           type: newBlock.type || 'Study',
-          subject: newBlock.subject || 'Mathematics',
+          subject: newBlock.subject || get().subjects[0]?.name || 'General',
         };
         set((state) => ({
           routines: state.routines.map((r) =>
@@ -423,13 +555,15 @@ export const useTaskStore = create(
         const newGeneratedTasks = routine.blocks
           .filter((block) => block.type === 'Study' || block.type === 'Review')
           .map((block, idx) => {
-            const subjectObj = get().subjects.find((s) => s.name === block.subject) || get().subjects[0];
+            const subjectObj = get().subjects.find(
+              (s) => s.name.toLowerCase() === (block.subject || '').trim().toLowerCase()
+            ) || get().subjects[0];
             return {
               id: `task-routine-${Date.now()}-${idx}`,
               title: block.title,
               description: `Generated from template "${routine.name}"`,
-              subjectId: subjectObj ? subjectObj.id : 'subj-math',
-              subject: block.subject || 'Mathematics',
+              subjectId: subjectObj ? subjectObj.id : 'subj-general',
+              subject: subjectObj ? subjectObj.name : (block.subject || 'General'),
               date: targetDateStr,
               startTime: block.time,
               endTime: block.time, // can be calculated
@@ -452,7 +586,7 @@ export const useTaskStore = create(
       logStudySession: ({ subjectName, durationMinutes, taskId }) => {
         const todayStr = format(new Date(), 'yyyy-MM-dd');
         const hoursToAdd = Number((durationMinutes / 60).toFixed(2));
-        const cleanSubjName = subjectName?.trim() || 'General';
+        const cleanSubjName = (subjectName || '').trim();
 
         set((state) => {
           let updatedSubjects = [...state.subjects];
@@ -460,14 +594,16 @@ export const useTaskStore = create(
             (s) => s.name.toLowerCase() === cleanSubjName.toLowerCase()
           );
 
+          let canonicalName = cleanSubjName;
           if (subjIdx >= 0) {
+            canonicalName = updatedSubjects[subjIdx].name;
             updatedSubjects[subjIdx] = {
               ...updatedSubjects[subjIdx],
               completedHoursThisWeek: Number(
                 ((updatedSubjects[subjIdx].completedHoursThisWeek || 0) + hoursToAdd).toFixed(1)
               ),
             };
-          } else if (cleanSubjName !== 'General') {
+          } else if (cleanSubjName && cleanSubjName.toLowerCase() !== 'general') {
             updatedSubjects.push({
               id: `subj-${Date.now()}`,
               name: cleanSubjName,
@@ -480,6 +616,8 @@ export const useTaskStore = create(
               totalChapters: 10,
               completedChapters: 0,
             });
+          } else {
+            canonicalName = updatedSubjects[0]?.name || 'General';
           }
 
           const existingLogIndex = state.timerLogs.findIndex((log) => log.date === todayStr);
@@ -487,15 +625,23 @@ export const useTaskStore = create(
 
           if (existingLogIndex >= 0) {
             const current = updatedLogs[existingLogIndex];
-            const currentSubjHours =
-              (current.subjectBreakdown && current.subjectBreakdown[cleanSubjName]) || 0;
+            const breakdown = { ...(current.subjectBreakdown || {}) };
+            let existingHours = 0;
+
+            // Merge any existing casing keys into canonicalName
+            Object.keys(breakdown).forEach((k) => {
+              if (k.toLowerCase() === canonicalName.toLowerCase()) {
+                existingHours += Number(breakdown[k]) || 0;
+                delete breakdown[k];
+              }
+            });
+
+            breakdown[canonicalName] = Number((existingHours + hoursToAdd).toFixed(2));
+
             updatedLogs[existingLogIndex] = {
               ...current,
               hours: Number(((current.hours || 0) + hoursToAdd).toFixed(2)),
-              subjectBreakdown: {
-                ...(current.subjectBreakdown || {}),
-                [cleanSubjName]: Number((currentSubjHours + hoursToAdd).toFixed(2)),
-              },
+              subjectBreakdown: breakdown,
             };
           } else {
             updatedLogs.push({
@@ -503,7 +649,7 @@ export const useTaskStore = create(
               hours: hoursToAdd,
               tasksCompleted: 0,
               subjectBreakdown: {
-                [cleanSubjName]: hoursToAdd,
+                [canonicalName]: hoursToAdd,
               },
             });
           }
@@ -518,7 +664,13 @@ export const useTaskStore = create(
       recordTaskCompletion: (task, isCompleting = true) => {
         const todayStr = format(new Date(), 'yyyy-MM-dd');
         const taskHours = Number(((task.duration || 60) / 60).toFixed(2));
-        const subjName = task.subject || 'General';
+
+        // Find canonical subject name
+        const stateSubjects = get().subjects;
+        const matchedSubj = stateSubjects.find(
+          (s) => s.id === task.subjectId || s.name.toLowerCase() === (task.subject || '').trim().toLowerCase()
+        );
+        const subjName = matchedSubj ? matchedSubj.name : (task.subject || 'General');
 
         set((state) => {
           const logIdx = state.timerLogs.findIndex((l) => l.date === todayStr);
@@ -527,15 +679,24 @@ export const useTaskStore = create(
           if (isCompleting) {
             if (logIdx >= 0) {
               const current = updatedLogs[logIdx];
-              const curSubj = (current.subjectBreakdown && current.subjectBreakdown[subjName]) || 0;
+              const breakdown = { ...(current.subjectBreakdown || {}) };
+              let curSubj = 0;
+
+              // Merge any case variants into subjName
+              Object.keys(breakdown).forEach((k) => {
+                if (k.toLowerCase() === subjName.toLowerCase()) {
+                  curSubj += Number(breakdown[k]) || 0;
+                  delete breakdown[k];
+                }
+              });
+
+              breakdown[subjName] = Number((curSubj + taskHours).toFixed(2));
+
               updatedLogs[logIdx] = {
                 ...current,
                 hours: Number(((current.hours || 0) + taskHours).toFixed(2)),
                 tasksCompleted: (current.tasksCompleted || 0) + 1,
-                subjectBreakdown: {
-                  ...(current.subjectBreakdown || {}),
-                  [subjName]: Number((curSubj + taskHours).toFixed(2)),
-                },
+                subjectBreakdown: breakdown,
               };
             } else {
               updatedLogs.push({
@@ -549,7 +710,7 @@ export const useTaskStore = create(
             }
 
             const updatedSubjects = state.subjects.map((s) => {
-              if (s.name === subjName || s.id === task.subjectId) {
+              if (s.name.toLowerCase() === subjName.toLowerCase() || s.id === task.subjectId) {
                 return {
                   ...s,
                   completedHoursThisWeek: Number(((s.completedHoursThisWeek || 0) + taskHours).toFixed(1)),
@@ -563,24 +724,34 @@ export const useTaskStore = create(
             // Uncompleting a task
             if (logIdx >= 0) {
               const current = updatedLogs[logIdx];
-              const curSubj = (current.subjectBreakdown && current.subjectBreakdown[subjName]) || 0;
+              const breakdown = { ...(current.subjectBreakdown || {}) };
+              let curSubj = 0;
+
+              Object.keys(breakdown).forEach((k) => {
+                if (k.toLowerCase() === subjName.toLowerCase()) {
+                  curSubj += Number(breakdown[k]) || 0;
+                  delete breakdown[k];
+                }
+              });
+
               const newHours = Math.max(0, Number(((current.hours || 0) - taskHours).toFixed(2)));
               const newSubjHours = Math.max(0, Number((curSubj - taskHours).toFixed(2)));
               const newTasksCompleted = Math.max(0, (current.tasksCompleted || 1) - 1);
+
+              if (newSubjHours > 0) {
+                breakdown[subjName] = newSubjHours;
+              }
 
               updatedLogs[logIdx] = {
                 ...current,
                 hours: newHours,
                 tasksCompleted: newTasksCompleted,
-                subjectBreakdown: {
-                  ...(current.subjectBreakdown || {}),
-                  [subjName]: newSubjHours,
-                },
+                subjectBreakdown: breakdown,
               };
             }
 
             const updatedSubjects = state.subjects.map((s) => {
-              if (s.name === subjName || s.id === task.subjectId) {
+              if (s.name.toLowerCase() === subjName.toLowerCase() || s.id === task.subjectId) {
                 return {
                   ...s,
                   completedHoursThisWeek: Math.max(0, Number(((s.completedHoursThisWeek || 0) - taskHours).toFixed(1))),

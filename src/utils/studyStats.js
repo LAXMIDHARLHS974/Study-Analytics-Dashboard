@@ -12,17 +12,18 @@ import {
   parseISO 
 } from 'date-fns';
 
-// Fake demo subjects to be strictly filtered out
-export const FAKE_SUBJECT_NAMES = new Set([
+// Legacy demo subjects to be strictly purged from historical data
+export const LEGACY_DEMO_SUBJECT_NAMES = new Set([
   'mathematics',
   'physics',
   'computer science',
   'computer sci',
   'chemistry',
 ]);
+export const FAKE_SUBJECT_NAMES = LEGACY_DEMO_SUBJECT_NAMES;
 
 /**
- * Extracts only genuine study hours from a log (excluding fake demo subjects)
+ * Extracts only genuine study hours from a log (excluding legacy fake demo subjects)
  */
 export const getGenuineLogHours = (log) => {
   if (!log) return 0;
@@ -30,8 +31,9 @@ export const getGenuineLogHours = (log) => {
     let genuineSum = 0;
     let hasEntries = false;
     Object.entries(log.subjectBreakdown).forEach(([name, hours]) => {
-      hasEntries = true;
-      if (!FAKE_SUBJECT_NAMES.has(name.trim().toLowerCase())) {
+      const lower = (name || '').trim().toLowerCase();
+      if (lower && !LEGACY_DEMO_SUBJECT_NAMES.has(lower)) {
+        hasEntries = true;
         genuineSum += Number(hours) || 0;
       }
     });
@@ -249,14 +251,32 @@ export const calculateSubjectDistribution = (timerLogs = [], subjects = [], time
   const safeLogs = Array.isArray(timerLogs) ? timerLogs : [];
   const safeSubjects = Array.isArray(subjects) ? subjects : [];
 
-  // Filter out any fake demo subjects from the subject list
-  const genuineSubjects = safeSubjects.filter(
-    (s) => s && s.name && !FAKE_SUBJECT_NAMES.has(s.name.trim().toLowerCase())
-  );
+  const defaultColors = ['#7B7FBF', '#4EBA88', '#52A5B5', '#F6B26B', '#5FB3B3', '#E57373', '#BA68C8'];
+  let colorIdx = 0;
 
-  // Filter logs by selected timeframe
+  // 1. Build canonical subject metadata map (case-insensitive deduplication)
+  const canonicalMap = new Map();
+
+  safeSubjects.forEach((s) => {
+    if (!s || !s.name) return;
+    const cleanName = s.name.trim();
+    const lowerKey = cleanName.toLowerCase();
+    if (LEGACY_DEMO_SUBJECT_NAMES.has(lowerKey)) return;
+
+    if (!canonicalMap.has(lowerKey)) {
+      canonicalMap.set(lowerKey, {
+        id: s.id || `subj-${lowerKey.replace(/\s+/g, '-')}`,
+        name: cleanName,
+        color: s.color || defaultColors[colorIdx++ % defaultColors.length],
+        code: s.code || cleanName.substring(0, 4).toUpperCase(),
+        targetHoursWeekly: s.targetHoursWeekly || 8,
+      });
+    }
+  });
+
+  // 2. Filter logs by selected timeframe
   const filteredLogs = safeLogs.filter((log) => {
-    if (!log.date) return false;
+    if (!log || !log.date) return false;
     if (timeFilter === 'today') {
       return log.date === todayStr;
     }
@@ -274,63 +294,56 @@ export const calculateSubjectDistribution = (timerLogs = [], subjects = [], time
     return true; // 'all'
   });
 
-  // Aggregate genuine hours by subject name
-  const subjectHoursMap = {};
+  // 3. Aggregate genuine hours case-insensitively
+  const hoursByLowerKey = {};
 
   filteredLogs.forEach((log) => {
-    if (log.subjectBreakdown && typeof log.subjectBreakdown === 'object') {
+    if (log && log.subjectBreakdown && typeof log.subjectBreakdown === 'object') {
       Object.entries(log.subjectBreakdown).forEach(([name, hours]) => {
-        if (!FAKE_SUBJECT_NAMES.has(name.trim().toLowerCase())) {
-          const h = Number(hours) || 0;
-          subjectHoursMap[name] = (subjectHoursMap[name] || 0) + h;
+        const cleanName = (name || '').trim();
+        const lowerKey = cleanName.toLowerCase();
+        if (!cleanName || LEGACY_DEMO_SUBJECT_NAMES.has(lowerKey)) return;
+
+        const h = Number(hours) || 0;
+        hoursByLowerKey[lowerKey] = (hoursByLowerKey[lowerKey] || 0) + h;
+
+        // If not in canonicalMap, add as a detected genuine subject
+        if (!canonicalMap.has(lowerKey)) {
+          canonicalMap.set(lowerKey, {
+            id: `subj-${lowerKey.replace(/\s+/g, '-')}`,
+            name: cleanName,
+            color: defaultColors[colorIdx++ % defaultColors.length],
+            code: cleanName.substring(0, 4).toUpperCase(),
+            targetHoursWeekly: 8,
+          });
         }
       });
     }
   });
 
-  // Map metadata (colors, codes) from store subjects
-  const defaultColors = ['#7B7FBF', '#4EBA88', '#52A5B5', '#F6B26B', '#5FB3B3', '#E57373', '#BA68C8'];
-  const subjectMetaMap = {};
-  let colorIdx = 0;
-
-  genuineSubjects.forEach((s) => {
-    subjectMetaMap[s.name] = {
-      color: s.color || defaultColors[colorIdx++ % defaultColors.length],
-      code: s.code || (s.name ? s.name.substring(0, 4).toUpperCase() : 'SUBJ'),
-      id: s.id,
-      targetHoursWeekly: s.targetHoursWeekly || 6,
-    };
-  });
-
-  // Merge registered subjects and any subjects with logged hours (excluding fake subjects)
-  const allSubjectNames = Array.from(new Set([
-    ...genuineSubjects.map((s) => s.name),
-    ...Object.keys(subjectHoursMap),
-  ])).filter((name) => Boolean(name) && !FAKE_SUBJECT_NAMES.has(name.trim().toLowerCase()));
-
+  // 4. Calculate total hours and generate unique canonical items
   let totalHours = 0;
-  allSubjectNames.forEach((name) => {
-    totalHours += subjectHoursMap[name] || 0;
-  });
-  totalHours = Number(totalHours.toFixed(1));
-
-  const items = allSubjectNames.map((name) => {
-    const hours = Number((subjectHoursMap[name] || 0).toFixed(1));
-    const percentage = totalHours > 0 ? Math.round((hours / totalHours) * 100) : 0;
-    const meta = subjectMetaMap[name] || {
-      color: defaultColors[colorIdx++ % defaultColors.length],
-      code: name.substring(0, 4).toUpperCase(),
-      id: `subj-${name.toLowerCase().replace(/\s+/g, '-')}`,
-    };
+  const rawItems = Array.from(canonicalMap.values()).map((meta) => {
+    const lowerKey = meta.name.toLowerCase();
+    const hours = Number((hoursByLowerKey[lowerKey] || 0).toFixed(1));
+    totalHours += hours;
 
     return {
-      name,
+      id: meta.id,
+      name: meta.name,
       hours,
-      value: percentage,
       color: meta.color,
       code: meta.code,
     };
   });
+
+  totalHours = Number(totalHours.toFixed(1));
+
+  // Compute accurate percentage for each subject
+  const items = rawItems.map((item) => ({
+    ...item,
+    value: totalHours > 0 ? Math.round((item.hours / totalHours) * 100) : 0,
+  }));
 
   // Sort descending by study hours
   items.sort((a, b) => b.hours - a.hours);

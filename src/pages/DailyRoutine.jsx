@@ -50,7 +50,7 @@ export default function DailyRoutine() {
     title: '',
     duration: 60,
     type: 'Study',
-    subject: subjects[0]?.name || 'Mathematics',
+    subject: subjects[0]?.name || 'General',
   });
 
   const activeRoutine = routines.find((r) => r.id === activeRoutineId) || routines[0];
@@ -116,7 +116,7 @@ export default function DailyRoutine() {
         title: block.title || '',
         duration: block.duration || 60,
         type: block.type || 'Study',
-        subject: block.subject || subjects[0]?.name || 'Mathematics',
+        subject: block.subject || subjects[0]?.name || 'General',
       });
     } else {
       setEditingBlock(null);
@@ -125,7 +125,7 @@ export default function DailyRoutine() {
         title: '',
         duration: 60,
         type: 'Study',
-        subject: subjects[0]?.name || 'Mathematics',
+        subject: subjects[0]?.name || 'General',
       });
     }
     setIsBlockModalOpen(true);
@@ -460,7 +460,7 @@ export default function DailyRoutine() {
                   required
                   value={blockForm.title}
                   onChange={(e) => setBlockForm({ ...blockForm, title: e.target.value })}
-                  placeholder="e.g. Physics Formula Memorization"
+                  placeholder="e.g. System Design Architecture"
                   className="w-full px-3.5 py-2 rounded-xl neu-inset border border-white/60 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none"
                 />
               </div>

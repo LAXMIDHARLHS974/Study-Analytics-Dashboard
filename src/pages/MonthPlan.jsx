@@ -136,7 +136,9 @@ export default function MonthPlan({ onOpenNewTask, onEditTask }) {
                 {/* Task Dots */}
                 <div className="flex flex-wrap gap-0.5 sm:gap-1 mt-1">
                   {dayTasks.slice(0, 4).map((task) => {
-                    const subj = subjects.find((s) => s.name === task.subject);
+                    const subj = subjects.find(
+                      (s) => s.id === task.subjectId || s.name.toLowerCase() === (task.subject || '').trim().toLowerCase()
+                    );
                     const color = subj ? subj.color : '#5FB3B3';
                     return (
                       <span

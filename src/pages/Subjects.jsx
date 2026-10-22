@@ -19,7 +19,7 @@ export default function Subjects() {
   const { distribution } = calculateSubjectDistribution(timerLogs, subjects, 'week');
   const weeklyHoursMap = {};
   distribution.forEach((d) => {
-    weeklyHoursMap[d.name] = d.hours;
+    weeklyHoursMap[d.name.toLowerCase()] = d.hours;
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,9 +78,11 @@ export default function Subjects() {
       {subjects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {subjects.map((subj) => {
-            const subjTasks = tasks.filter((t) => t.subjectId === subj.id || t.subject === subj.name);
-            const weeklyHours = weeklyHoursMap[subj.name] !== undefined
-              ? weeklyHoursMap[subj.name]
+            const subjTasks = tasks.filter(
+              (t) => t.subjectId === subj.id || (t.subject || '').trim().toLowerCase() === subj.name.toLowerCase()
+            );
+            const weeklyHours = weeklyHoursMap[subj.name.toLowerCase()] !== undefined
+              ? weeklyHoursMap[subj.name.toLowerCase()]
               : (subj.completedHoursThisWeek || 0);
             const weeklyPct = Math.min(
               100,

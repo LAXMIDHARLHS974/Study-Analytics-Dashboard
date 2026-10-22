@@ -60,7 +60,9 @@ export default function TodayTasksCard({ onOpenNewTask }) {
       <div className="space-y-2.5 flex-1 flex flex-col justify-center">
         {displayTasks.length > 0 ? (
           displayTasks.map((task) => {
-            const subject = subjects.find((s) => s.name === task.subject);
+            const subject = subjects.find(
+              (s) => s.id === task.subjectId || s.name.toLowerCase() === (task.subject || '').trim().toLowerCase()
+            );
             const color = subject ? subject.color : '#5FB3B3';
             const isDone = task.status === 'Done';
             const time12h = formatTo12Hour(task.startTime || '10:00');

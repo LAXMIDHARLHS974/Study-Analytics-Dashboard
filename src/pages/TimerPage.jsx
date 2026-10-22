@@ -42,6 +42,22 @@ export default function TimerPage() {
   // Get active task
   const currentTask = tasks.find((t) => t.id === activeTaskId);
 
+  // Ensure activeSubject always matches a genuine registered subject
+  useEffect(() => {
+    if (subjects.length > 0) {
+      const match = subjects.find(
+        (s) => s.name.toLowerCase() === (activeSubject || '').trim().toLowerCase()
+      );
+      if (match) {
+        if (activeSubject !== match.name) {
+          setTimerState({ activeSubject: match.name });
+        }
+      } else {
+        setTimerState({ activeSubject: subjects[0].name });
+      }
+    }
+  }, [subjects, activeSubject, setTimerState]);
+
   // Total seconds for current mode
   const getTotalSecondsForMode = (mode) => {
     switch (mode) {
@@ -77,15 +93,20 @@ export default function TimerPage() {
     triggerBigMilestone();
 
     if (timerMode === 'work') {
+      const effectiveSubject =
+        activeSubject ||
+        currentTask?.subject ||
+        (subjects.length > 0 ? subjects[0].name : 'General');
+
       // Log session
       logStudySession({
-        subjectName: activeSubject || 'Mathematics',
+        subjectName: effectiveSubject,
         durationMinutes: workDuration,
         taskId: activeTaskId,
       });
 
       sendNotification('Focus Sprint Completed! 🎉', {
-        body: `Great job! You completed a ${workDuration}m study sprint on ${activeSubject}. Take a break!`,
+        body: `Great job! You completed a ${workDuration}m study sprint on ${effectiveSubject}. Take a break!`,
       });
 
       const nextCompletedCount = completedSessionsCount + 1;
@@ -309,7 +330,7 @@ export default function TimerPage() {
             ) : (
               <input
                 type="text"
-                placeholder="Enter subject name (e.g. Maths, Science, History)"
+                placeholder="Enter subject name (e.g. DSA, English, Backend)"
                 value={activeSubject || ''}
                 onChange={(e) => setTimerState({ activeSubject: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl neu-inset text-xs font-bold text-slate-800 dark:text-white border border-white/60 dark:border-slate-700 focus:outline-none"

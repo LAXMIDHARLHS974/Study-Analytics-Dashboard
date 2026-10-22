@@ -74,7 +74,7 @@ export default function Today({ onOpenNewTask, onEditTask }) {
   // Filter tasks for selected date and active filters
   const dateTasks = useMemo(() => {
     return allDateTasks.filter((t) => {
-      if (selectedSubject !== 'all' && t.subject !== selectedSubject) return false;
+      if (selectedSubject !== 'all' && (t.subject || '').trim().toLowerCase() !== selectedSubject.trim().toLowerCase()) return false;
       if (statusFilter === 'pending' && t.status === 'Done') return false;
       if (statusFilter === 'done' && t.status !== 'Done') return false;
       return true;
@@ -419,7 +419,7 @@ export default function Today({ onOpenNewTask, onEditTask }) {
               <div className="space-y-2">
                 {sortedPlannedTasks.map((task) => {
                   const subjectObj = subjects.find(
-                    (s) => s.id === task.subjectId || s.name === task.subject
+                    (s) => s.id === task.subjectId || s.name.toLowerCase() === (task.subject || '').trim().toLowerCase()
                   );
                   const subjectColor = subjectObj ? subjectObj.color : '#3B82F6';
                   const isDone = task.status === 'Done';

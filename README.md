@@ -45,7 +45,7 @@ Recreated with pixel-crafted fidelity from the 3D claymorphic music dashboard st
 - **Dynamic Greeting**: Time-based greeting ("Good Morning / Afternoon / Evening, Aryan!")
 - **4 Tactile Stat Cards**: Tasks Completed, Study Hours, Current Streak (7 days), Pending Tasks (with +/- weekly changes).
 - **Study Overview Bar Chart**: Weekly study hours with pill caps and time filters ("This Week", "Last Week").
-- **Subject Distribution Donut Chart**: Visual time breakdown across Mathematics, Physics, Computer Science, Chemistry, and English.
+- **Subject Distribution Donut Chart**: Dynamic time breakdown across your genuine subjects (DSA, English, Backend, and custom subjects).
 - **Today's Tasks List**: Play timer directly from task, interactive completion checkbox with chime and confetti celebration.
 - **Daily Mix Routine Card**: Cozy 3D armchair scene with routine sprint launcher.
 - **Stay Consistent Mascot Banner**: Motivational reminder with quick link to long-term goals.

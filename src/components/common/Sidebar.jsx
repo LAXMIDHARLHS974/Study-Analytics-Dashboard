@@ -9,7 +9,6 @@ import {
   BookMarked,
   BarChart3,
   Settings,
-  Timer,
   Layers,
   X
 } from 'lucide-react';
@@ -24,7 +23,6 @@ const navItems = [
   { path: '/routine', label: 'Daily Routine', icon: Layers },
   { path: '/subjects', label: 'Subjects', icon: BookMarked },
   { path: '/goals', label: 'Goals', icon: Target },
-  { path: '/timer', label: 'Study Timer', icon: Timer, hideOnMobile: true },
   { path: '/analytics', label: 'Analytics', icon: BarChart3, hideOnMobile: true },
   { path: '/settings', label: 'Settings', icon: Settings, hideOnMobile: true },
 ];

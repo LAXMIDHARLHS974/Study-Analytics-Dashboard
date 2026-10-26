@@ -1,26 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Sparkles, ChevronRight, Layers } from 'lucide-react';
+import { Sparkles, ChevronRight, ArrowRight } from 'lucide-react';
 import { useTaskStore } from '../../store/useTaskStore';
-import { useSettingsStore } from '../../store/useSettingsStore';
 
 export default function DailyMixCard() {
   const navigate = useNavigate();
   const { routines } = useTaskStore();
-  const { setTimerState } = useSettingsStore();
 
   const routine = routines[0] || {
     name: 'Weekday High-Focus Schedule',
     blocks: [1, 2, 3, 4, 5, 6],
-  };
-
-  const handleStartSprint = () => {
-    setTimerState({
-      timerSecondsLeft: 25 * 60,
-      isTimerRunning: true,
-      timerMode: 'work',
-    });
-    navigate('/timer');
   };
 
   return (
@@ -62,11 +51,11 @@ export default function DailyMixCard() {
           </div>
 
           <button
-            onClick={handleStartSprint}
+            onClick={() => navigate('/routine')}
             className="w-10 h-10 rounded-full bg-brand-teal hover:bg-brand-teal/90 text-white flex items-center justify-center shadow-lg active:scale-95 transition-all group-hover:scale-110"
-            title="Start Routine Sprint"
+            title="Open Daily Routine"
           >
-            <Play className="w-4 h-4 fill-current ml-0.5" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>

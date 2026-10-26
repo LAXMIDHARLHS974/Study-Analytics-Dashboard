@@ -27,7 +27,7 @@ export default function YearPlan() {
     const target = Number(m.targetHours) || 120;
     const fromProgress = progress > 0 ? Math.round(target * (progress / 100)) : 0;
 
-    // Any actual timer study hours logged in timerLogs for that month
+    // Any actual study hours logged in timerLogs for that month
     let timerHours = 0;
     if (Array.isArray(timerLogs)) {
       timerLogs.forEach((l) => {

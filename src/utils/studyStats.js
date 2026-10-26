@@ -47,7 +47,7 @@ export const getGenuineLogHours = (log) => {
 /**
  * Calculates accurate current streak, best streak, and study status.
  * Visiting the website every day increments the streak (daily visit streak),
- * in addition to completing tasks or studying via timer.
+ * in addition to completing tasks or studying.
  */
 export const calculateStreak = (timerLogs = [], tasks = []) => {
   const activeDateSet = new Set();

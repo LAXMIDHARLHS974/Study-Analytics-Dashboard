@@ -1,8 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Check, Clock, ChevronRight } from 'lucide-react';
+import { Check, Clock, ChevronRight } from 'lucide-react';
 import { useTaskStore } from '../../store/useTaskStore';
-import { useSettingsStore } from '../../store/useSettingsStore';
 import { soundManager } from '../../utils/audio';
 import { triggerConfetti } from '../../utils/confetti';
 import { formatTo12Hour } from '../../utils/timeFormat';
@@ -11,22 +10,10 @@ import { format } from 'date-fns';
 export default function TodayTasksCard({ onOpenNewTask }) {
   const navigate = useNavigate();
   const { tasks, toggleTaskStatus, subjects } = useTaskStore();
-  const { setTimerState } = useSettingsStore();
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayTasks = tasks.filter((t) => t.date === todayStr);
   const displayTasks = todayTasks.length > 0 ? todayTasks.slice(0, 3) : tasks.slice(0, 3);
-
-  const handleStartTimer = (task) => {
-    setTimerState({
-      activeTaskId: task.id,
-      activeSubject: task.subject,
-      timerSecondsLeft: (task.duration || 25) * 60,
-      isTimerRunning: true,
-      timerMode: 'work',
-    });
-    navigate('/timer');
-  };
 
   const handleToggle = (task, e) => {
     const isNowDone = toggleTaskStatus(task.id);
@@ -93,7 +80,7 @@ export default function TodayTasksCard({ onOpenNewTask }) {
                 {/* Details */}
                 <div className="min-w-0 flex-1">
                   <h4
-                    className={`text-xs font-bold truncate ${
+                    className={`text-xs font-bold break-words line-clamp-2 ${
                       isDone
                         ? 'line-through text-slate-500 dark:text-slate-400'
                         : 'text-slate-800 dark:text-white'
@@ -110,15 +97,6 @@ export default function TodayTasksCard({ onOpenNewTask }) {
                   </div>
                 </div>
               </div>
-
-              {/* Square Play Button */}
-              <button
-                onClick={() => handleStartTimer(task)}
-                className="w-7 h-7 rounded-lg flex items-center justify-center bg-brand-teal/20 hover:bg-brand-teal text-brand-teal hover:text-white transition-all shadow-sm shrink-0 ml-2 active:scale-90"
-                title="Start Pomodoro Timer"
-              >
-                <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-              </button>
             </div>
           );
         })

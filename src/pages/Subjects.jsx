@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   BookMarked,
   Plus, 
   Clock, 
-  Play, 
   Trash2
 } from 'lucide-react';
 import { useTaskStore } from '../store/useTaskStore';
-import { useSettingsStore } from '../store/useSettingsStore';
 import { calculateSubjectDistribution } from '../utils/studyStats';
 
 export default function Subjects() {
-  const navigate = useNavigate();
   const { subjects, addSubject, deleteSubject, tasks, timerLogs } = useTaskStore();
-  const { setTimerState } = useSettingsStore();
 
   const { distribution } = calculateSubjectDistribution(timerLogs, subjects, 'week');
   const weeklyHoursMap = {};
@@ -30,16 +25,6 @@ export default function Subjects() {
     targetHoursWeekly: 8,
     totalChapters: 12,
   });
-
-  const handleStartTimer = (subjName) => {
-    setTimerState({
-      activeSubject: subjName,
-      timerSecondsLeft: 25 * 60,
-      isTimerRunning: true,
-      timerMode: 'work',
-    });
-    navigate('/timer');
-  };
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -138,15 +123,7 @@ export default function Subjects() {
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="mt-5 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between">
-                  <button
-                    onClick={() => handleStartTimer(subj.name)}
-                    className="neu-teal-btn px-4 py-1.5 text-xs font-bold flex items-center gap-1.5 shadow"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-current" />
-                    <span>Focus Sprint</span>
-                  </button>
-
+                <div className="mt-5 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-end">
                   <button
                     onClick={() => deleteSubject(subj.id)}
                     className="p-1.5 text-slate-400 hover:text-brand-coral transition-colors"

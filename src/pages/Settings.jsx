@@ -160,7 +160,7 @@ export default function Settings() {
         </div>
 
         <a
-          href="https://laxmidharlhs974.github.io/my-website-LHS/"
+          href="https://my-website-5lor.onrender.com/"
           target="_blank"
           rel="noopener noreferrer"
           className="group px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600/10 via-indigo-500/15 to-violet-500/10 dark:from-blue-500/20 dark:via-indigo-500/20 dark:to-violet-500/20 hover:from-blue-600/20 hover:via-indigo-500/25 hover:to-violet-500/20 border border-indigo-200/60 dark:border-indigo-500/40 hover:border-indigo-400 dark:hover:border-indigo-400 shadow-sm hover:shadow-md text-xs sm:text-sm font-extrabold text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-white flex items-center gap-1.5 tracking-wide transition-all duration-200 active:scale-95 cursor-pointer"

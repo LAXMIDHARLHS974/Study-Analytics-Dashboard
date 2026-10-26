@@ -55,7 +55,6 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
       case '/routine': return 'Daily Routine';
       case '/subjects': return 'Subjects';
       case '/goals': return 'Academic Goals';
-      case '/timer': return 'Pomodoro Timer';
       case '/analytics': return 'Study Analytics';
       case '/settings': return 'App Settings';
       default: return 'BUILD LHS';
@@ -209,7 +208,7 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
                             className="p-2 rounded-lg bg-white dark:bg-slate-900/90 border border-rose-200/70 dark:border-rose-900/50 flex items-center justify-between text-xs hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm cursor-pointer transition-all"
                           >
                             <div className="min-w-0 flex-1 mr-2">
-                              <span className="font-semibold text-slate-900 dark:text-slate-100 block truncate">
+                              <span className="font-semibold text-slate-900 dark:text-slate-100 block break-words line-clamp-2">
                                 {task.title}
                               </span>
                               <span className="text-[10px] text-rose-600 dark:text-rose-400 block truncate font-medium">
@@ -268,7 +267,7 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
                             className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100/90 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between text-xs cursor-pointer transition-all group shadow-sm hover:shadow"
                           >
                             <div className="min-w-0 flex-1 mr-2">
-                              <span className="font-semibold text-slate-900 dark:text-slate-100 block truncate group-hover:text-royal-600 dark:group-hover:text-royal-400 transition-colors">
+                              <span className="font-semibold text-slate-900 dark:text-slate-100 block break-words line-clamp-2 group-hover:text-royal-600 dark:group-hover:text-royal-400 transition-colors">
                                 {task.title}
                               </span>
                               <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">

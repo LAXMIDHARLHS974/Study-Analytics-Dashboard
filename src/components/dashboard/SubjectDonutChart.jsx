@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { useTaskStore } from '../../store/useTaskStore';
 import { calculateSubjectDistribution } from '../../utils/studyStats';
-import { Play, PieChart as PieIcon, Sparkles } from 'lucide-react';
+import { PieChart as PieIcon, Sparkles } from 'lucide-react';
 
 const CustomDonutTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -174,11 +174,11 @@ export default function SubjectDonutChart() {
             {totalHours === 0 && (
               <div className="pt-1 text-center">
                 <button
-                  onClick={() => navigate('/timer')}
+                  onClick={() => navigate('/today')}
                   className="text-[11px] font-semibold text-brand-teal hover:underline inline-flex items-center gap-1"
                 >
-                  <Play className="w-3 h-3 fill-current" />
-                  <span>Start a study sprint</span>
+                  <Sparkles className="w-3 h-3 text-brand-teal" />
+                  <span>Plan study tasks today</span>
                 </button>
               </div>
             )}

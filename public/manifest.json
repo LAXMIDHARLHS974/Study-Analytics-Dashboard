@@ -1,7 +1,7 @@
 {
   "name": "BUILD LHS - Study Planner & Daily Routine Tracker",
   "short_name": "BUILD LHS",
-  "description": "Tactile neumorphic study planner, Pomodoro focus timer, task manager, and routine tracker.",
+  "description": "Tactile neumorphic study planner, task manager, and routine tracker.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   Check, 
   Clock, 
-  Play, 
   MoreVertical, 
   Edit3, 
   Copy, 
@@ -11,15 +9,12 @@ import {
   Calendar 
 } from 'lucide-react';
 import { useTaskStore } from '../../store/useTaskStore';
-import { useSettingsStore } from '../../store/useSettingsStore';
 import { soundManager } from '../../utils/audio';
 import { triggerConfetti } from '../../utils/confetti';
 import { formatTo12Hour } from '../../utils/timeFormat';
 
 export default function TaskItem({ task, onEdit, variant = 'row' }) {
-  const navigate = useNavigate();
   const { toggleTaskStatus, deleteTask, duplicateTask, subjects } = useTaskStore();
-  const { setTimerState } = useSettingsStore();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -50,18 +45,6 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
         y: (rect.top + rect.height / 2) / window.innerHeight,
       });
     }
-  };
-
-  const handleStartTimer = (e) => {
-    e.stopPropagation();
-    setTimerState({
-      activeTaskId: task.id,
-      activeSubject: task.subject,
-      timerSecondsLeft: (task.duration || 25) * 60,
-      isTimerRunning: true,
-      timerMode: 'work',
-    });
-    navigate('/timer');
   };
 
   const isDone = task.status === 'Done';
@@ -144,9 +127,9 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
 
         {/* Center: Full Task Title */}
         <h4
-          className={`text-xs font-bold leading-snug line-clamp-2 my-1 text-left ${
+          className={`text-xs font-bold leading-snug break-words line-clamp-3 my-1 text-left ${
             isDone
-              ? 'line-through text-slate-400 dark:text-slate-500'
+              ? 'line-through text-slate-500 dark:text-slate-400'
               : 'text-slate-800 dark:text-slate-100'
           }`}
           title={task.title}
@@ -163,16 +146,6 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
           </div>
 
           <div className="flex items-center gap-1">
-            {!isDone && (
-              <button
-                onClick={handleStartTimer}
-                title="Start Focus Timer"
-                className="w-6 h-6 rounded-md bg-brand-teal/20 hover:bg-brand-teal text-brand-teal hover:text-white flex items-center justify-center transition-all shadow-sm active:scale-95"
-              >
-                <Play className="w-3 h-3 fill-current ml-0.5" />
-              </button>
-            )}
-
             {/* Square tactile checkbox */}
             <button
               type="button"
@@ -219,7 +192,7 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`text-xs sm:text-sm font-semibold truncate ${
+              className={`text-xs sm:text-sm font-bold break-words line-clamp-2 sm:line-clamp-none ${
                 isDone
                   ? 'line-through text-slate-500 dark:text-slate-400'
                   : 'text-slate-800 dark:text-slate-100'
@@ -267,18 +240,8 @@ export default function TaskItem({ task, onEdit, variant = 'row' }) {
         </div>
       </div>
 
-      {/* Right: Quick Play Timer & Options menu */}
+      {/* Right: Options menu */}
       <div className="flex items-center gap-1.5 shrink-0 ml-2">
-        {!isDone && (
-          <button
-            onClick={handleStartTimer}
-            title="Start Focus Timer on this task"
-            className="w-8 h-8 rounded-lg flex items-center justify-center bg-brand-teal/20 hover:bg-brand-teal text-brand-teal hover:text-white transition-all shadow-sm active:scale-90"
-          >
-            <Play className="w-3.5 h-3.5 ml-0.5 fill-current" />
-          </button>
-        )}
-
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}

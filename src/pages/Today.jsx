@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   format,
   addDays,
@@ -17,7 +16,6 @@ import {
   ChevronRight,
   ArrowRight,
   Sparkles,
-  Play,
   Sunrise,
   Sun,
   Moon,
@@ -30,16 +28,13 @@ import {
   CalendarDays
 } from 'lucide-react';
 import { useTaskStore } from '../store/useTaskStore';
-import { useSettingsStore } from '../store/useSettingsStore';
 import TaskItem from '../components/tasks/TaskItem';
 import { formatHourTo12Hour, formatTo12Hour } from '../utils/timeFormat';
 import { soundManager } from '../utils/audio';
 import { triggerConfetti } from '../utils/confetti';
 
 export default function Today({ onOpenNewTask, onEditTask }) {
-  const navigate = useNavigate();
   const { tasks, subjects, routines, applyRoutineToDate, toggleTaskStatus, deleteTask } = useTaskStore();
-  const { setTimerState } = useSettingsStore();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSubject, setSelectedSubject] = useState('all');
@@ -94,14 +89,7 @@ export default function Today({ onOpenNewTask, onEditTask }) {
   // Calculate daily stats
   const totalTasksCount = allDateTasks.length;
   const completedTasksCount = allDateTasks.filter((t) => t.status === 'Done').length;
-  const totalPlannedMinutes = allDateTasks.reduce((acc, t) => acc + (Number(t.duration) || 60), 0);
-  const totalPlannedHours = (totalPlannedMinutes / 60).toFixed(1);
   const completionPercentage = totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0;
-
-  // Next up pending task
-  const nextPendingTask = useMemo(() => {
-    return allDateTasks.find((t) => t.status !== 'Done') || null;
-  }, [allDateTasks]);
 
   // Generate 7-day strip based on current selected date
   const weekDays = useMemo(() => {
@@ -148,19 +136,6 @@ export default function Today({ onOpenNewTask, onEditTask }) {
 
   const handlePrevDay = () => setSelectedDate((d) => addDays(d, -1));
   const handleNextDay = () => setSelectedDate((d) => addDays(d, 1));
-  const handleSetToday = () => setSelectedDate(new Date());
-  const handleSetTomorrow = () => setSelectedDate(addDays(new Date(), 1));
-
-  const handleStartTimerOnTask = (task) => {
-    setTimerState({
-      activeTaskId: task.id,
-      activeSubject: task.subject,
-      timerSecondsLeft: (task.duration || 25) * 60,
-      isTimerRunning: true,
-      timerMode: 'work',
-    });
-    navigate('/timer');
-  };
 
   const handleToggleTask = (task, e) => {
     e.stopPropagation();
@@ -213,30 +188,12 @@ export default function Today({ onOpenNewTask, onEditTask }) {
                 )}
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">
-                {format(selectedDate, 'MMM d, yyyy')} • {allDateTasks.length} session{allDateTasks.length === 1 ? '' : 's'}
+                {format(selectedDate, 'MMM d, yyyy')}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 self-end sm:self-auto">
-            <button
-              onClick={handleSetToday}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${isToday
-                  ? 'neu-teal-btn text-white'
-                  : 'neu-pill-btn text-slate-800 dark:text-slate-100 hover:text-royal-600 dark:hover:text-white'
-                }`}
-            >
-              Today
-            </button>
-            <button
-              onClick={handleSetTomorrow}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${isTomorrow
-                  ? 'neu-teal-btn text-white'
-                  : 'neu-pill-btn text-slate-800 dark:text-slate-100 hover:text-royal-600 dark:hover:text-white'
-                }`}
-            >
-              Tomorrow
-            </button>
             <button
               onClick={() => onOpenNewTask?.()}
               className="neu-teal-btn flex items-center gap-1 px-3 py-1 text-xs font-bold shadow-sm"
@@ -303,45 +260,21 @@ export default function Today({ onOpenNewTask, onEditTask }) {
       </div>
 
       {/* 2. Compact Daily Progress Strip */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 sm:gap-3">
-        {/* Progress bar */}
-        <div className="md:col-span-7 clay-card p-3 sm:p-3.5 flex flex-col justify-between gap-2 shadow-glass-card border border-white/10">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-              <TrendingUp className="w-3.5 h-3.5 text-royal-600 dark:text-royal-400" />
-              Daily Progress
-            </span>
-            <span className="font-extrabold text-royal-700 dark:text-royal-300">
-              {completionPercentage}% Done • {completedTasksCount}/{totalTasksCount} tasks
-            </span>
-          </div>
-          <div className="w-full h-2 rounded-full bg-slate-300/60 dark:bg-slate-900/60 overflow-hidden neu-inset">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-royal-600 via-royal-500 to-violet-neon shadow-[0_0_12px_rgba(168,85,247,0.5)] transition-all duration-300"
-              style={{ width: `${Math.max(4, completionPercentage)}%` }}
-            />
-          </div>
+      <div className="clay-card p-3 sm:p-3.5 flex flex-col justify-between gap-2 shadow-glass-card border border-white/10">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5 text-royal-600 dark:text-royal-400" />
+            Daily Progress
+          </span>
+          <span className="font-extrabold text-royal-700 dark:text-royal-300">
+            {completionPercentage}% Done • {completedTasksCount}/{totalTasksCount} tasks
+          </span>
         </div>
-
-        {/* Next Focus Card */}
-        <div className="md:col-span-5 clay-card p-3 sm:p-3.5 flex items-center justify-between gap-2 shadow-glass-card border border-white/10">
-          <div className="min-w-0 flex-1">
-            <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-              Next Focus Session
-            </span>
-            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-              {nextPendingTask ? nextPendingTask.title : totalTasksCount > 0 ? "All completed 🎉" : "No session scheduled"}
-            </p>
-          </div>
-          {nextPendingTask && (
-            <button
-              onClick={() => handleStartTimerOnTask(nextPendingTask)}
-              className="neu-teal-btn px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shrink-0 shadow-xs active:scale-95 transition-all text-white"
-            >
-              <Play className="w-3 h-3 fill-current" />
-              <span>Focus</span>
-            </button>
-          )}
+        <div className="w-full h-2 rounded-full bg-slate-300/60 dark:bg-slate-900/60 overflow-hidden neu-inset">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-royal-600 via-royal-500 to-violet-neon shadow-[0_0_12px_rgba(168,85,247,0.5)] transition-all duration-300"
+            style={{ width: `${Math.max(4, completionPercentage)}%` }}
+          />
         </div>
       </div>
 
@@ -430,20 +363,20 @@ export default function Today({ onOpenNewTask, onEditTask }) {
                   return (
                     <div
                       key={task.id}
-                      className={`group flex items-center justify-between p-2.5 rounded-xl border transition-all duration-150 backdrop-blur-md ${isDone
-                          ? 'bg-slate-100/70 dark:bg-[#070B19]/50 border-slate-200/80 dark:border-white/5 opacity-60'
+                      className={`group flex items-start sm:items-center justify-between p-2.5 sm:p-3 rounded-xl border transition-all duration-150 backdrop-blur-md ${isDone
+                          ? 'bg-slate-100/80 dark:bg-[#070B19]/60 border-slate-200/80 dark:border-white/5 opacity-85'
                           : isCurrent
                             ? 'bg-royal-50/90 dark:bg-royal-950/70 border-royal-400/80 dark:border-royal-500/60 shadow-[0_0_15px_rgba(37,99,235,0.25)] ring-1 ring-royal-400/50'
                             : 'bg-white/80 dark:bg-[#0E1636]/75 hover:bg-white dark:hover:bg-[#152048] border-slate-200/90 dark:border-white/10 shadow-xs hover:shadow-md'
                         }`}
                       style={{ borderLeftWidth: '4px', borderLeftColor: subjectColor }}
                     >
-                      {/* Left: Checkbox, Time, Title */}
-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      {/* Left: Checkbox + Content */}
+                      <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
                         <button
                           type="button"
                           onClick={(e) => handleToggleTask(task, e)}
-                          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 ${isDone
+                          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 mt-0.5 sm:mt-0 ${isDone
                               ? 'bg-gradient-to-r from-royal-600 to-violet-neon text-white shadow-[0_0_10px_rgba(168,85,247,0.5)]'
                               : 'border-2 border-slate-400 dark:border-slate-500 hover:border-royal-500 bg-white/50 dark:bg-white/5'
                             }`}
@@ -452,57 +385,60 @@ export default function Today({ onOpenNewTask, onEditTask }) {
                           {isDone && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </button>
 
-                        {/* Start time pill */}
-                        <span className="text-[11px] font-mono font-bold text-royal-700 dark:text-royal-300 bg-royal-100/80 dark:bg-royal-500/20 border border-royal-300/80 dark:border-royal-500/30 px-2 py-0.5 rounded-md shrink-0">
-                          {formattedStart}
-                        </span>
-
-                        {/* Title & Subject */}
-                        <div className="min-w-0 flex-1 flex items-center gap-2 truncate">
-                          <span
-                            className={`text-xs sm:text-sm font-bold truncate ${isDone
-                                ? 'line-through text-slate-400 dark:text-slate-500'
-                                : 'text-slate-900 dark:text-white'
-                              }`}
-                          >
-                            {task.title}
-                          </span>
-
-                          <span
-                            className="text-[9px] font-bold px-1.5 py-0.5 rounded truncate shrink-0 hidden sm:inline"
-                            style={{
-                              backgroundColor: `${subjectColor}18`,
-                              color: subjectColor,
-                              border: `1px solid ${subjectColor}45`,
-                            }}
-                          >
-                            {task.subject}
-                          </span>
-
-                          {task.priority === 'High' && (
-                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-100 dark:bg-brand-coral/20 text-rose-700 dark:text-brand-coral border border-rose-300 dark:border-brand-coral/30 shrink-0">
-                              High
+                        {/* Title, Time & Badges */}
+                        <div className="min-w-0 flex-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2.5">
+                          {/* Title - clearly visible, wraps onto next line if long, no aggressive cut-off */}
+                          <div className="min-w-0 flex-1">
+                            <span
+                              onClick={() => onEditTask?.(task)}
+                              className={`text-xs sm:text-sm font-bold break-words line-clamp-2 sm:line-clamp-none cursor-pointer hover:underline block leading-snug ${isDone
+                                  ? 'line-through text-slate-500 dark:text-slate-400'
+                                  : 'text-slate-900 dark:text-white'
+                                }`}
+                              title={task.title}
+                            >
+                              {task.title}
                             </span>
-                          )}
+                          </div>
+
+                          {/* Time, Subject & Priority tags */}
+                          <div className="flex items-center gap-1.5 flex-wrap shrink-0">
+                            {/* Start time pill */}
+                            <span className="text-[10px] sm:text-[11px] font-mono font-bold text-royal-700 dark:text-royal-300 bg-royal-100/80 dark:bg-royal-500/20 border border-royal-300/80 dark:border-royal-500/30 px-1.5 sm:px-2 py-0.5 rounded-md shrink-0">
+                              {formattedStart}
+                            </span>
+
+                            {task.subject && (
+                              <span
+                                className="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0"
+                                style={{
+                                  backgroundColor: `${subjectColor}18`,
+                                  color: subjectColor,
+                                  border: `1px solid ${subjectColor}45`,
+                                }}
+                              >
+                                {task.subject}
+                              </span>
+                            )}
+
+                            {task.priority === 'High' && (
+                              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-100 dark:bg-brand-coral/20 text-rose-700 dark:text-brand-coral border border-rose-300 dark:border-brand-coral/30 shrink-0">
+                                High
+                              </span>
+                            )}
+
+                            <span className="text-[10px] text-slate-600 dark:text-slate-300 font-semibold sm:hidden">
+                              {task.duration || 60}m
+                            </span>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Right: Duration & Actions */}
-                      <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                        <span className="text-[10px] text-slate-600 dark:text-slate-300 font-semibold hidden xs:inline">
+                      {/* Right: Actions */}
+                      <div className="flex items-center gap-1 shrink-0 ml-2 mt-0.5 sm:mt-0">
+                        <span className="text-[10px] text-slate-600 dark:text-slate-300 font-semibold hidden sm:inline mr-1">
                           {task.duration || 60}m
                         </span>
-
-                        {!isDone && (
-                          <button
-                            onClick={() => handleStartTimerOnTask(task)}
-                            className="neu-teal-btn px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-xs active:scale-95 transition-all text-white"
-                            title="Start Focus Timer"
-                          >
-                            <Play className="w-3 h-3 fill-current" />
-                            <span className="hidden sm:inline">Focus</span>
-                          </button>
-                        )}
 
                         <button
                           onClick={() => onEditTask?.(task)}
@@ -523,20 +459,6 @@ export default function Today({ onOpenNewTask, onEditTask }) {
                     </div>
                   );
                 })}
-
-                {/* Quick Add Slot under planned sessions */}
-                <div className="pt-1 flex items-center justify-between text-xs">
-                  <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">
-                    Total: {totalPlannedHours} hrs planned today
-                  </span>
-                  <button
-                    onClick={() => onOpenNewTask?.()}
-                    className="text-xs font-bold text-royal-600 dark:text-royal-400 hover:text-violet-600 dark:hover:text-violet-neon-bright hover:underline flex items-center gap-1 transition-colors"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Add another session</span>
-                  </button>
-                </div>
               </div>
             ) : (
               <div className="py-6 text-center space-y-2">
@@ -579,11 +501,11 @@ export default function Today({ onOpenNewTask, onEditTask }) {
                         {hourTasks.map((t) => (
                           <div
                             key={t.id}
-                            className="p-1.5 rounded-lg bg-white/80 dark:bg-[#0E1636]/80 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between hover:border-violet-500/40 hover:shadow-glass-card transition-all"
+                            className="p-1.5 sm:p-2 rounded-lg bg-white/80 dark:bg-[#0E1636]/80 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between hover:border-violet-500/40 hover:shadow-glass-card transition-all"
                           >
                             <span 
                               onClick={() => onEditTask?.(t)}
-                              className="truncate cursor-pointer hover:underline flex-1"
+                              className="break-words line-clamp-2 cursor-pointer hover:underline flex-1 min-w-0"
                             >
                               {t.title}
                             </span>

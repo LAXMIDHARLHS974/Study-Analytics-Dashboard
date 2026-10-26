@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import Sidebar from './components/common/Sidebar';
 import TopBar from './components/common/TopBar';
 import TaskModal from './components/tasks/TaskModal';
@@ -13,11 +13,10 @@ import YearPlan from './pages/YearPlan';
 import DailyRoutine from './pages/DailyRoutine';
 import Subjects from './pages/Subjects';
 import Goals from './pages/Goals';
-import TimerPage from './pages/TimerPage';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 
-import { Home, Compass, BarChart3, Timer, User } from 'lucide-react';
+import { Home, Compass, BarChart3, User } from 'lucide-react';
 import { useTaskStore } from './store/useTaskStore';
 import { useSettingsStore } from './store/useSettingsStore';
 
@@ -105,9 +104,10 @@ export default function App() {
               <Route path="/routine" element={<DailyRoutine />} />
               <Route path="/subjects" element={<Subjects />} />
               <Route path="/goals" element={<Goals />} />
-              <Route path="/timer" element={<TimerPage />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/timer" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
         </div>
@@ -189,27 +189,7 @@ export default function App() {
               )}
             </NavLink>
 
-            {/* 4. Timer */}
-            <NavLink
-              to="/timer"
-              className={({ isActive }) =>
-                `flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all duration-200 ${isActive
-                  ? 'bg-gradient-to-b from-[#8B5CF6]/95 via-[#7C3AED]/95 to-[#6D28D9]/95 text-white shadow-[0_4px_16px_rgba(139,92,246,0.65),inset_0_1px_1px_rgba(255,255,255,0.5)] border border-white/30 scale-[1.02]'
-                  : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-white/20 dark:hover:bg-white/10'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Timer className={`w-5 h-5 transition-transform ${isActive ? 'stroke-[2.2] scale-105' : 'stroke-[1.9]'}`} />
-                  <span className={`text-[10px] tracking-tight mt-0.5 ${isActive ? 'font-bold text-white' : 'font-semibold text-slate-700 dark:text-slate-300'}`}>
-                    Timer
-                  </span>
-                </>
-              )}
-            </NavLink>
-
-            {/* 5. Profile / Settings */}
+            {/* 4. Profile / Settings */}
             <NavLink
               to="/settings"
               className={({ isActive }) =>

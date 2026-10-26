@@ -72,27 +72,17 @@ Recreated with pixel-crafted fidelity from the 3D claymorphic music dashboard st
 - Time-blocked schedule (Wake up, Math problem sets, Lectures, Physics deep work, Breaks, Anki review).
 - One-click **"Apply to Today"** or **"Apply to Tomorrow"** automatically populates your schedule with scheduled tasks!
 
-### 4. Interactive Pomodoro Study Timer (`/timer`)
-- 25m Focus / 5m Short Break / 15m Long Break intervals.
-- Links timer session to specific tasks and subjects.
-- **Offline Web Audio Ambient Soundscapes**:
-  - Gentle Rain 🌧️
-  - Soft White Noise 💨
-  - Tibetan Bell on session completion 🔔
-- Automatically logs minutes to the subject and updates the 365-day heatmap and weekly analytics!
-
-### 5. Curriculum & Goal Trackers
+### 4. Curriculum & Goal Trackers
 - **Subjects Tracker** (`/subjects`): Syllabus completion %, chapter counts, and weekly hour targets.
 - **Goals Tracker** (`/goals`): Long-term milestones (e.g. "Score 95% in Board Exams", "Complete AP Physics C") with progress bars and linked task counts.
 
-### 6. Analytics & 365-Day Study Heatmap (`/analytics`)
+### 5. Analytics & 365-Day Study Heatmap (`/analytics`)
 - GitHub-style study intensity heatmap with date-hover tooltips.
 - Monthly planned vs completed tasks trend line chart.
 - Focus efficiency and streak tracking metrics.
 
-### 7. Offline Storage, Backup & Settings (`/settings`)
+### 6. Offline Storage, Backup & Settings (`/settings`)
 - Avatar switcher (Choose between 3D clay avatars).
-- Pomodoro duration customizations.
 - **Export Backup (JSON)**: Download your entire planner state.
 - **Import Backup (JSON)**: Restore tasks and routines from file.
 - **Reset All Data**: Reset to default rich seed data anytime.

@@ -582,7 +582,7 @@ export const useTaskStore = create(
         return newGeneratedTasks.length;
       },
 
-      // Log study session from Pomodoro or manual entry
+      // Log study session or manual entry
       logStudySession: ({ subjectName, durationMinutes, taskId }) => {
         const todayStr = format(new Date(), 'yyyy-MM-dd');
         const hoursToAdd = Number((durationMinutes / 60).toFixed(2));

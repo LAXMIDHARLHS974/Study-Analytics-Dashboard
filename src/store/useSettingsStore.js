@@ -29,14 +29,9 @@ export const useSettingsStore = create(
         }
       },
 
-      // Pomodoro Settings
-      workDuration: 25, // mins
-      shortBreakDuration: 5, // mins
-      longBreakDuration: 15, // mins
-      longBreakInterval: 4, // sessions
+      // Sound
       soundEnabled: true,
       soundVolume: 0.5,
-      ambientSound: 'none', // 'none' | 'rain' | 'whitenoise'
 
       // Notifications
       notificationsEnabled: true,
@@ -47,22 +42,8 @@ export const useSettingsStore = create(
       },
       clearReadNotifications: () => set({ readNotificationIds: [] }),
 
-      // Active Pomodoro State
-      isTimerRunning: false,
-      timerSecondsLeft: 25 * 60,
-      timerMode: 'work', // 'work' | 'shortBreak' | 'longBreak'
-      activeTaskId: null,
-      activeSubject: 'DSA',
-      completedSessionsCount: 0,
-
       // Profile updates
       updateProfile: (profile) => set(profile),
-
-      // Timer settings updates
-      updateTimerSettings: (settings) => set(settings),
-
-      // Active timer state mutations
-      setTimerState: (updates) => set(updates),
     }),
     {
       name: 'build-lhs-settings-v1',
@@ -73,10 +54,6 @@ export const useSettingsStore = create(
           document.documentElement.classList.add('dark');
         } else {
           document.documentElement.classList.remove('dark');
-        }
-        // Purge legacy fake subject default
-        if (state && (state.activeSubject === 'Mathematics' || !state.activeSubject)) {
-          state.activeSubject = 'DSA';
         }
       },
     }

@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { X, Sparkles, Trash2 } from 'lucide-react';
 import { useTaskStore } from '../../store/useTaskStore';
 import { format } from 'date-fns';
-import { formatTo12Hour } from '../../utils/timeFormat';
 
 export default function TaskModal({ isOpen, onClose, initialTask = null }) {
-  const { subjects, goals, addTask, updateTask, deleteTask } = useTaskStore();
+  const { subjects, addTask, updateTask, deleteTask } = useTaskStore();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -204,7 +203,7 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Start Time <span className="text-brand-teal font-mono font-semibold">({formatTo12Hour(formData.startTime)})</span>
+                Start Time
               </label>
               <input
                 type="time"
@@ -229,72 +228,7 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
             </div>
           </div>
 
-          {/* Status & Repeat */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Status
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
-              >
-                <option value="Todo" className="bg-slate-800 text-white">Todo</option>
-                <option value="In Progress" className="bg-slate-800 text-white">In Progress</option>
-                <option value="Done" className="bg-slate-800 text-white">Done</option>
-              </select>
-            </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Repeat Routine
-              </label>
-              <select
-                value={formData.repeat}
-                onChange={(e) => setFormData({ ...formData, repeat: e.target.value })}
-                className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
-              >
-                <option value="none" className="bg-slate-800 text-white">None (Once)</option>
-                <option value="daily" className="bg-slate-800 text-white">Daily</option>
-                <option value="weekly" className="bg-slate-800 text-white">Weekly</option>
-                <option value="monthly" className="bg-slate-800 text-white">Monthly</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Linked Goal */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Link to Long-Term Goal (Optional)
-            </label>
-            <select
-              value={formData.goalId}
-              onChange={(e) => setFormData({ ...formData, goalId: e.target.value })}
-              className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
-            >
-              <option value="" className="bg-slate-800 text-white">None</option>
-              {goals.map((g) => (
-                <option key={g.id} value={g.id} className="bg-slate-800 text-white">
-                  {g.title} ({g.progress}%)
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Notes & Problem References
-            </label>
-            <textarea
-              rows={2}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="e.g. Textbook chapter 4 exercises 1-20, review notes..."
-              className="w-full px-4 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal resize-none"
-            />
-          </div>
 
           {/* Footer Actions */}
           <div className="pt-3 flex items-center justify-between gap-3 border-t border-slate-300/40 dark:border-slate-700/60">

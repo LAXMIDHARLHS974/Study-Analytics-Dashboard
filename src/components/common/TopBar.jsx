@@ -64,9 +64,17 @@ export default function TopBar({ onOpenSidebar, onOpenNewTask }) {
   // Keyboard shortcut: Pressing 'N' opens new task
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const target = e.target;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
 
-      if (e.key.toLowerCase() === 'n' && !e.metaKey && !e.ctrlKey) {
+      if (e.key.toLowerCase() === 'n' && !e.metaKey && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
         onOpenNewTask();
       }

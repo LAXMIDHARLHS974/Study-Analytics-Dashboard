@@ -44,8 +44,14 @@ export default function App() {
     }
   }, [recordDailyVisit]);
 
-  const handleOpenNewTask = () => {
-    setEditingTask(null);
+  const handleOpenNewTask = (prefill = null) => {
+    const isPrefillObj =
+      prefill &&
+      typeof prefill === 'object' &&
+      !('nativeEvent' in prefill) &&
+      !('preventDefault' in prefill);
+    if (taskModalOpen && !isPrefillObj) return;
+    setEditingTask(isPrefillObj ? prefill : null);
     setTaskModalOpen(true);
   };
 
@@ -214,7 +220,10 @@ export default function App() {
         {/* 4. Global Task Modal */}
         <TaskModal
           isOpen={taskModalOpen}
-          onClose={() => setTaskModalOpen(false)}
+          onClose={() => {
+            setTaskModalOpen(false);
+            setEditingTask(null);
+          }}
           initialTask={editingTask}
         />
       </div>

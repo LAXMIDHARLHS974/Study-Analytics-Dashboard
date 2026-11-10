@@ -198,7 +198,7 @@ export default function MonthPlan({ onOpenNewTask, onEditTask }) {
               <button
                 onClick={() => {
                   setIsDayModalOpen(false);
-                  onOpenNewTask();
+                  onOpenNewTask?.({ date: selectedDateStr });
                 }}
                 className="neu-teal-btn flex items-center gap-1.5 px-4 py-2 text-xs font-bold"
               >

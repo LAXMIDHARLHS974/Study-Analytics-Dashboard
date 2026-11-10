@@ -12,18 +12,12 @@ import {
   parseISO 
 } from 'date-fns';
 
-// Legacy demo subjects to be strictly purged from historical data
-export const LEGACY_DEMO_SUBJECT_NAMES = new Set([
-  'mathematics',
-  'physics',
-  'computer science',
-  'computer sci',
-  'chemistry',
-]);
+// Empty set retained for backwards-compatible exports; user subjects of any name are counted
+export const LEGACY_DEMO_SUBJECT_NAMES = new Set();
 export const FAKE_SUBJECT_NAMES = LEGACY_DEMO_SUBJECT_NAMES;
 
 /**
- * Extracts only genuine study hours from a log (excluding legacy fake demo subjects)
+ * Extracts study hours from a log
  */
 export const getGenuineLogHours = (log) => {
   if (!log) return 0;
@@ -32,7 +26,7 @@ export const getGenuineLogHours = (log) => {
     let hasEntries = false;
     Object.entries(log.subjectBreakdown).forEach(([name, hours]) => {
       const lower = (name || '').trim().toLowerCase();
-      if (lower && !LEGACY_DEMO_SUBJECT_NAMES.has(lower)) {
+      if (lower) {
         hasEntries = true;
         genuineSum += Number(hours) || 0;
       }
@@ -261,7 +255,6 @@ export const calculateSubjectDistribution = (timerLogs = [], subjects = [], time
     if (!s || !s.name) return;
     const cleanName = s.name.trim();
     const lowerKey = cleanName.toLowerCase();
-    if (LEGACY_DEMO_SUBJECT_NAMES.has(lowerKey)) return;
 
     if (!canonicalMap.has(lowerKey)) {
       canonicalMap.set(lowerKey, {
@@ -302,7 +295,7 @@ export const calculateSubjectDistribution = (timerLogs = [], subjects = [], time
       Object.entries(log.subjectBreakdown).forEach(([name, hours]) => {
         const cleanName = (name || '').trim();
         const lowerKey = cleanName.toLowerCase();
-        if (!cleanName || LEGACY_DEMO_SUBJECT_NAMES.has(lowerKey)) return;
+        if (!cleanName) return;
 
         const h = Number(hours) || 0;
         hoursByLowerKey[lowerKey] = (hoursByLowerKey[lowerKey] || 0) + h;

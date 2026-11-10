@@ -10,6 +10,13 @@ import {
   INITIAL_MONTHS_PLAN
 } from '../data/seed';
 
+const LEGACY_DEMO_SUBJECT_IDS = new Set([
+  'subj-math',
+  'subj-phys',
+  'subj-cs',
+  'subj-chem',
+]);
+
 const LEGACY_DEMO_SUBJECT_NAMES = new Set([
   'mathematics',
   'physics',
@@ -22,23 +29,35 @@ const FAKE_TASK_IDS = new Set([
   'task-1', 'task-2', 'task-3', 'task-4', 'task-5', 'task-6', 'task-7', 'task-8', 'task-9', 'task-10', 'task-11'
 ]);
 
-// Auto-sanitizer that removes fake demo data, deduplicates subjects, and canonicalizes task & log subjects
-export const sanitizeStoreState = (rawState) => {
-  if (!rawState) return rawState;
+const createUniqueId = (prefix) => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return `${prefix}-${crypto.randomUUID()}`;
+  }
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+};
+
+// Normalize persisted state and (only when migrating legacy v1 data) remove old v1 demo seed items
+export const sanitizeStoreState = (rawState, { isLegacyV1Migration = false } = {}) => {
+  if (!rawState || typeof rawState !== 'object') return rawState;
   const todayStr = format(new Date(), 'yyyy-MM-dd');
 
-  // Filter out legacy fake subjects and deduplicate remaining subjects case-insensitively
+  const rawSubjects = Array.isArray(rawState.subjects) ? rawState.subjects : INITIAL_SUBJECTS;
+
+  // Deduplicate subjects case-insensitively; only strip v1 demo seed subjects during v1 migration
   const subjectMap = new Map();
-  (rawState.subjects || []).forEach((s) => {
+  rawSubjects.forEach((s) => {
     if (!s || !s.name) return;
     const cleanName = s.name.trim();
+    if (!cleanName) return;
     const key = cleanName.toLowerCase();
-    if (LEGACY_DEMO_SUBJECT_NAMES.has(key)) return;
+
+    if (isLegacyV1Migration && LEGACY_DEMO_SUBJECT_IDS.has(s.id)) {
+      return;
+    }
 
     if (!subjectMap.has(key)) {
       subjectMap.set(key, { ...s, name: cleanName });
     } else {
-      // Merge completed weekly hours into the canonical entry
       const existing = subjectMap.get(key);
       subjectMap.set(key, {
         ...existing,
@@ -50,16 +69,20 @@ export const sanitizeStoreState = (rawState) => {
   });
 
   let cleanSubjects = Array.from(subjectMap.values());
-  if (cleanSubjects.length === 0) {
+  if (!Array.isArray(rawState.subjects) && cleanSubjects.length === 0) {
     cleanSubjects = INITIAL_SUBJECTS;
   }
 
-  // Filter out fake tasks & normalize task subjects to match canonical subjects
-  let cleanTasks = (rawState.tasks || [])
+  const rawTasks = Array.isArray(rawState.tasks) ? rawState.tasks : INITIAL_TASKS;
+
+  // Preserve all user tasks; only strip hardcoded v1 demo tasks during v1 migration
+  let cleanTasks = rawTasks
     .filter((t) => {
       if (!t) return false;
-      if (FAKE_TASK_IDS.has(t.id)) return false;
-      if (t.subject && LEGACY_DEMO_SUBJECT_NAMES.has(t.subject.trim().toLowerCase())) return false;
+      if (isLegacyV1Migration) {
+        if (FAKE_TASK_IDS.has(t.id)) return false;
+        if (LEGACY_DEMO_SUBJECT_IDS.has(t.subjectId)) return false;
+      }
       return true;
     })
     .map((t) => {
@@ -72,28 +95,34 @@ export const sanitizeStoreState = (rawState) => {
       return t;
     });
 
-  if (cleanTasks.length === 0) {
+  if (!Array.isArray(rawState.tasks) && cleanTasks.length === 0) {
     cleanTasks = INITIAL_TASKS;
   }
 
-  // Clean timerLogs (strip fake subjects and merge duplicate casing keys)
-  let cleanLogs = (rawState.timerLogs || [])
+  // Normalize timerLogs casing; only strip legacy v1 demo subject logs during v1 migration
+  let cleanLogs = (Array.isArray(rawState.timerLogs) ? rawState.timerLogs : [])
     .map((log) => {
       if (!log) return null;
       const cleanBreakdown = {};
-      let cleanHours = 0;
+      let breakdownHours = 0;
+      let hasBreakdownEntries = false;
       if (log.subjectBreakdown && typeof log.subjectBreakdown === 'object') {
         Object.entries(log.subjectBreakdown).forEach(([name, hours]) => {
-          const key = (name || '').trim().toLowerCase();
-          if (!LEGACY_DEMO_SUBJECT_NAMES.has(key)) {
-            const match = cleanSubjects.find((s) => s.name.toLowerCase() === key);
-            const canonicalName = match ? match.name : name.trim();
-            const h = Number(hours) || 0;
-            cleanBreakdown[canonicalName] = Number(((cleanBreakdown[canonicalName] || 0) + h).toFixed(2));
-            cleanHours += h;
+          const trimmed = (name || '').trim();
+          const key = trimmed.toLowerCase();
+          if (!trimmed) return;
+          if (isLegacyV1Migration && LEGACY_DEMO_SUBJECT_NAMES.has(key) && !log.visited) {
+            return;
           }
+          hasBreakdownEntries = true;
+          const match = cleanSubjects.find((s) => s.name.toLowerCase() === key);
+          const canonicalName = match ? match.name : trimmed;
+          const h = Number(hours) || 0;
+          cleanBreakdown[canonicalName] = Number(((cleanBreakdown[canonicalName] || 0) + h).toFixed(2));
+          breakdownHours += h;
         });
       }
+      const cleanHours = hasBreakdownEntries ? breakdownHours : (Number(log.hours) || 0);
       if (cleanHours === 0 && !log.tasksCompleted && !log.visited) {
         return null;
       }
@@ -119,27 +148,25 @@ export const sanitizeStoreState = (rawState) => {
     });
   }
 
-  // Ensure routines do not have fake subjects
-  let cleanRoutines = rawState.routines || INITIAL_ROUTINES;
-  if (Array.isArray(cleanRoutines)) {
-    cleanRoutines = cleanRoutines.map((r) => {
-      if (!r || !Array.isArray(r.blocks)) return r;
-      return {
-        ...r,
-        blocks: r.blocks.map((b) => {
-          const lower = (b.subject || '').trim().toLowerCase();
-          if (LEGACY_DEMO_SUBJECT_NAMES.has(lower)) {
-            return { ...b, subject: cleanSubjects[0]?.name || 'DSA' };
-          }
-          const match = cleanSubjects.find((s) => s.name.toLowerCase() === lower);
-          if (match) {
-            return { ...b, subject: match.name };
-          }
-          return b;
-        }),
-      };
-    });
-  }
+  // Canonicalize routine block subject casing without overwriting user subjects
+  let cleanRoutines = Array.isArray(rawState.routines) ? rawState.routines : INITIAL_ROUTINES;
+  cleanRoutines = cleanRoutines.map((r) => {
+    if (!r || !Array.isArray(r.blocks)) return r;
+    return {
+      ...r,
+      blocks: r.blocks.map((b) => {
+        const lower = (b.subject || '').trim().toLowerCase();
+        if (isLegacyV1Migration && LEGACY_DEMO_SUBJECT_NAMES.has(lower)) {
+          return { ...b, subject: cleanSubjects[0]?.name || 'DSA' };
+        }
+        const match = cleanSubjects.find((s) => s.name.toLowerCase() === lower);
+        if (match) {
+          return { ...b, subject: match.name };
+        }
+        return b;
+      }),
+    };
+  });
 
   // Ensure completed/progressed yearly plan months reflect genuine logged hours
   let cleanYearlyPlan = rawState.yearlyPlan;
@@ -170,41 +197,6 @@ export const sanitizeStoreState = (rawState) => {
   };
 };
 
-// Immediately sanitize localStorage in the browser
-if (typeof window !== 'undefined' && window.localStorage) {
-  ['build-lhs-v1', 'build-lhs-genuine-v1'].forEach((key) => {
-    try {
-      const item = window.localStorage.getItem(key);
-      if (item) {
-        const parsed = JSON.parse(item);
-        if (parsed && parsed.state) {
-          const sanitized = sanitizeStoreState(parsed.state);
-          window.localStorage.setItem(key, JSON.stringify({ ...parsed, state: sanitized }));
-        }
-      }
-    } catch {
-      // ignore
-    }
-  });
-
-  // Also clean build-lhs-settings-v1 of legacy fake subject defaults
-  try {
-    const settingsItem = window.localStorage.getItem('build-lhs-settings-v1');
-    if (settingsItem) {
-      const parsedSettings = JSON.parse(settingsItem);
-      if (parsedSettings && parsedSettings.state) {
-        const lower = (parsedSettings.state.activeSubject || '').trim().toLowerCase();
-        if (!parsedSettings.state.activeSubject || LEGACY_DEMO_SUBJECT_NAMES.has(lower)) {
-          parsedSettings.state.activeSubject = 'DSA';
-          window.localStorage.setItem('build-lhs-settings-v1', JSON.stringify(parsedSettings));
-        }
-      }
-    }
-  } catch {
-    // ignore
-  }
-}
-
 export const useTaskStore = create(
   persist(
     (set, get) => ({
@@ -229,7 +221,7 @@ export const useTaskStore = create(
 
       // Task actions
       addTask: (newTask) => {
-        const id = `task-${Date.now()}`;
+        const id = createUniqueId('task');
         const rawSubj = (newTask.subject || '').trim();
         let subjId = newTask.subjectId;
 
@@ -252,7 +244,7 @@ export const useTaskStore = create(
           subjId = existingSubject.id;
           subjName = existingSubject.name; // Use canonical existing subject casing
         } else if (rawSubj && rawSubj.toLowerCase() !== 'general') {
-          subjId = `subj-${Date.now()}`;
+          subjId = createUniqueId('subj');
           const newSubjObj = {
             id: subjId,
             name: rawSubj,
@@ -326,7 +318,7 @@ export const useTaskStore = create(
         if (!original) return;
         const duplicate = {
           ...original,
-          id: `task-${Date.now()}`,
+          id: createUniqueId('task'),
           title: `${original.title} (Copy)`,
           status: 'Todo',
           completedAt: null,
@@ -403,7 +395,7 @@ export const useTaskStore = create(
           return;
         }
 
-        const id = `subj-${Date.now()}`;
+        const id = createUniqueId('subj');
         const subject = {
           id,
           name: rawName,
@@ -429,18 +421,21 @@ export const useTaskStore = create(
 
       deleteSubject: (id) => {
         const target = get().subjects.find((s) => s.id === id);
-        const targetName = target ? target.name.toLowerCase() : '';
+        if (!target) return;
+        const targetName = (target.name || '').trim().toLowerCase();
         set((state) => ({
           subjects: state.subjects.filter((s) => s.id !== id),
           tasks: state.tasks.filter(
-            (t) => t.subjectId !== id && (t.subject || '').trim().toLowerCase() !== targetName
+            (t) =>
+              t.subjectId !== id &&
+              (!targetName || (t.subject || '').trim().toLowerCase() !== targetName)
           ),
         }));
       },
 
       // Goal actions
       addGoal: (newGoal) => {
-        const id = `goal-${Date.now()}`;
+        const id = createUniqueId('goal');
         const goal = {
           id,
           title: newGoal.title,
@@ -470,7 +465,7 @@ export const useTaskStore = create(
 
       // Routine actions
       addRoutine: (newRoutine) => {
-        const id = `routine-${Date.now()}`;
+        const id = createUniqueId('routine');
         const routine = {
           id,
           name: newRoutine.name,
@@ -481,6 +476,7 @@ export const useTaskStore = create(
         set((state) => ({
           routines: [...state.routines, routine],
         }));
+        return routine;
       },
 
       updateRoutine: (id, updates) => {
@@ -496,7 +492,7 @@ export const useTaskStore = create(
       },
 
       addRoutineBlock: (routineId, newBlock) => {
-        const blockId = `block-${Date.now()}`;
+        const blockId = createUniqueId('block');
         const block = {
           id: blockId,
           time: newBlock.time || '08:00',
@@ -559,7 +555,7 @@ export const useTaskStore = create(
               (s) => s.name.toLowerCase() === (block.subject || '').trim().toLowerCase()
             ) || get().subjects[0];
             return {
-              id: `task-routine-${Date.now()}-${idx}`,
+              id: createUniqueId(`task-routine-${idx}`),
               title: block.title,
               description: `Generated from template "${routine.name}"`,
               subjectId: subjectObj ? subjectObj.id : 'subj-general',
@@ -605,7 +601,7 @@ export const useTaskStore = create(
             };
           } else if (cleanSubjName && cleanSubjName.toLowerCase() !== 'general') {
             updatedSubjects.push({
-              id: `subj-${Date.now()}`,
+              id: createUniqueId('subj'),
               name: cleanSubjName,
               code: cleanSubjName.substring(0, 4).toUpperCase(),
               color: '#5FB3B3',
@@ -810,6 +806,9 @@ export const useTaskStore = create(
       // Daily visit tracking: increments streak every day user visits the website
       recordDailyVisit: () => {
         const todayStr = format(new Date(), 'yyyy-MM-dd');
+        const existing = (get().timerLogs || []).find((l) => l.date === todayStr);
+        if (existing?.visited) return;
+
         set((state) => {
           const logIdx = state.timerLogs.findIndex((l) => l.date === todayStr);
           if (logIdx >= 0) {
@@ -847,22 +846,27 @@ export const useTaskStore = create(
     }),
     {
       name: 'build-lhs-v1',
-      version: 2,
-      migrate: (persistedState) => {
-        return sanitizeStoreState(persistedState);
+      version: 3,
+      migrate: (persistedState, version) => {
+        return sanitizeStoreState(persistedState, { isLegacyV1Migration: version < 2 });
       },
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          const sanitized = sanitizeStoreState(state);
-          useTaskStore.setState(sanitized);
-          if (typeof state.recordDailyVisit === 'function') {
-            state.recordDailyVisit();
-          }
+        if (state && typeof state.recordDailyVisit === 'function') {
+          state.recordDailyVisit();
         }
       },
     }
   )
 );
+
+// Keep multiple open tabs synchronized so one tab never overwrites newer planned tasks
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'build-lhs-v1' && event.newValue) {
+      useTaskStore.persist.rehydrate();
+    }
+  });
+}
 
 // Trigger daily visit tracking immediately on load
 try {

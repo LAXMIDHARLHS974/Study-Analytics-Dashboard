@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 
 export default function TaskModal({ isOpen, onClose, initialTask = null }) {
   const { subjects, addTask, updateTask, deleteTask } = useTaskStore();
+  const isEditing = Boolean(initialTask?.id);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -23,12 +24,22 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
   });
 
   useEffect(() => {
+    if (!isOpen) return;
+
+    const currentSubjects = useTaskStore.getState().subjects || [];
+    const defaultSubj = currentSubjects[0] || null;
     if (initialTask) {
+      const rawSubj = (initialTask.subject || '').trim().toLowerCase();
+      const matchedSubj = currentSubjects.find(
+        (s) => s.id === initialTask.subjectId || (rawSubj && s.name.toLowerCase() === rawSubj)
+      );
+      const fallbackSubj = matchedSubj || (initialTask.id ? null : defaultSubj);
+
       setFormData({
         title: initialTask.title || '',
         description: initialTask.description || '',
-        subjectId: initialTask.subjectId || subjects[0]?.id || '',
-        subject: initialTask.subject || subjects[0]?.name || '',
+        subjectId: matchedSubj ? matchedSubj.id : (initialTask.subjectId || fallbackSubj?.id || ''),
+        subject: matchedSubj ? matchedSubj.name : (initialTask.subject || fallbackSubj?.name || ''),
         date: initialTask.date || format(new Date(), 'yyyy-MM-dd'),
         startTime: initialTask.startTime || '10:00',
         endTime: initialTask.endTime || '11:00',
@@ -36,15 +47,15 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
         priority: initialTask.priority || 'Medium',
         status: initialTask.status || 'Todo',
         repeat: initialTask.repeat || 'none',
-        reminder: Boolean(initialTask.reminder),
+        reminder: initialTask.reminder !== undefined ? Boolean(initialTask.reminder) : true,
         goalId: initialTask.goalId || '',
       });
     } else {
       setFormData({
         title: '',
         description: '',
-        subjectId: subjects[0]?.id || '',
-        subject: subjects[0]?.name || '',
+        subjectId: defaultSubj?.id || '',
+        subject: defaultSubj?.name || '',
         date: format(new Date(), 'yyyy-MM-dd'),
         startTime: '10:00',
         endTime: '11:00',
@@ -56,7 +67,7 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
         goalId: '',
       });
     }
-  }, [initialTask, isOpen, subjects]);
+  }, [initialTask, isOpen]);
 
   if (!isOpen) return null;
 
@@ -73,13 +84,16 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
     e.preventDefault();
     if (!formData.title.trim()) return;
 
-    if (initialTask) {
+    if (isEditing) {
       updateTask(initialTask.id, formData);
     } else {
       addTask(formData);
     }
     onClose();
   };
+
+  const hasMissingSubjectOption =
+    Boolean(formData.subjectId) && !subjects.some((s) => s.id === formData.subjectId);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -95,7 +109,7 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-800 dark:text-white">
-                {initialTask ? 'Edit Study Task' : 'Plan New Study Task'}
+                {isEditing ? 'Edit Study Task' : 'Plan New Study Task'}
               </h3>
             </div>
           </div>
@@ -137,6 +151,11 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
                   onChange={handleSubjectChange}
                   className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
                 >
+                  {hasMissingSubjectOption && (
+                    <option value={formData.subjectId} className="bg-slate-800 text-white">
+                      {formData.subject || 'General'}
+                    </option>
+                  )}
                   {subjects.map((s) => (
                     <option key={s.id} value={s.id} className="bg-slate-800 text-white">
                       {s.name}
@@ -152,7 +171,7 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
                     setFormData({
                       ...formData,
                       subject: e.target.value,
-                      subjectId: `subj-${Date.now()}`,
+                      subjectId: '',
                     })
                   }
                   className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
@@ -195,6 +214,7 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
               </label>
               <input
                 type="date"
+                required
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 className="w-full px-3 py-2 rounded-2xl neu-inset border border-white/60 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
@@ -232,7 +252,7 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
 
           {/* Footer Actions */}
           <div className="pt-3 flex items-center justify-between gap-3 border-t border-slate-300/40 dark:border-slate-700/60">
-            {initialTask ? (
+            {isEditing ? (
               <button
                 type="button"
                 onClick={() => {
@@ -260,7 +280,7 @@ export default function TaskModal({ isOpen, onClose, initialTask = null }) {
                 type="submit"
                 className="px-6 py-2 rounded-xl neu-teal-btn text-xs font-bold shadow-lg"
               >
-                {initialTask ? 'Save Changes' : 'Create Task'}
+                {isEditing ? 'Save Changes' : 'Create Task'}
               </button>
             </div>
           </div>

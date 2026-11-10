@@ -97,12 +97,13 @@ export default function DailyRoutine() {
     if (editingTemplate) {
       updateRoutine(editingTemplate.id, templateForm);
     } else {
-      const newId = `routine-${Date.now()}`;
-      addRoutine({
+      const created = addRoutine({
         ...templateForm,
         blocks: [],
       });
-      setActiveRoutineId(newId);
+      if (created?.id) {
+        setActiveRoutineId(created.id);
+      }
     }
     setIsTemplateModalOpen(false);
   };

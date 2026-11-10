@@ -153,15 +153,16 @@ export default function Today({ onOpenNewTask, onEditTask }) {
   const handleAddSlotAtHour = (hour) => {
     const formattedHourStr = `${String(hour).padStart(2, '0')}:00`;
     const endHourStr = `${String((hour + 1) % 24).padStart(2, '0')}:00`;
-    if (typeof onEditTask === 'function') {
-      onEditTask({
-        date: selectedDateStr,
-        startTime: formattedHourStr,
-        endTime: endHourStr,
-        duration: 60,
-      });
-    } else if (typeof onOpenNewTask === 'function') {
-      onOpenNewTask();
+    const slotPrefill = {
+      date: selectedDateStr,
+      startTime: formattedHourStr,
+      endTime: endHourStr,
+      duration: 60,
+    };
+    if (typeof onOpenNewTask === 'function') {
+      onOpenNewTask(slotPrefill);
+    } else if (typeof onEditTask === 'function') {
+      onEditTask(slotPrefill);
     }
   };
 
@@ -195,7 +196,7 @@ export default function Today({ onOpenNewTask, onEditTask }) {
 
           <div className="flex items-center gap-2 self-end sm:self-auto">
             <button
-              onClick={() => onOpenNewTask?.()}
+              onClick={() => onOpenNewTask?.({ date: selectedDateStr })}
               className="neu-teal-btn flex items-center gap-1 px-3 py-1 text-xs font-bold shadow-sm"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -466,7 +467,7 @@ export default function Today({ onOpenNewTask, onEditTask }) {
                   No sessions scheduled for {format(selectedDate, 'MMM d')}
                 </p>
                 <button
-                  onClick={() => onOpenNewTask?.()}
+                  onClick={() => onOpenNewTask?.({ date: selectedDateStr })}
                   className="neu-teal-btn px-3.5 py-1.5 text-xs font-bold inline-flex items-center gap-1.5 shadow-sm"
                 >
                   <Plus className="w-3.5 h-3.5" />

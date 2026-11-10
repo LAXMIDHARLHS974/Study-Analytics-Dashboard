@@ -168,7 +168,7 @@ export default function WeekPlan({ onOpenNewTask, onEditTask }) {
 
               {/* Bottom Quick Add (Square Box Button) */}
               <button
-                onClick={onOpenNewTask}
+                onClick={() => onOpenNewTask?.({ date: dateStr })}
                 className="w-full mt-3 py-2 rounded-lg border border-dashed border-slate-300/70 dark:border-slate-700 text-xs font-bold text-slate-500 hover:text-brand-teal hover:border-brand-teal flex items-center justify-center gap-1.5 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />

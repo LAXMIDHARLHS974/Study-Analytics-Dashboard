@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { 
-  Settings as SettingsIcon, 
   User, 
   Download, 
   Upload, 
@@ -14,11 +13,14 @@ import {
   ExternalLink,
   Lock,
   LogOut,
-  Mail
+  Mail,
+  Flame,
+  BookMarked
 } from 'lucide-react';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useTaskStore } from '../store/useTaskStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { calculateStreak } from '../utils/studyStats';
 
 const DEFAULT_AVATAR = '/assets/student_avatar.jpg';
 
@@ -29,9 +31,11 @@ export default function Settings() {
     updateProfile 
   } = useSettingsStore();
 
-  const { exportDataJSON, importDataJSON, resetAllData } = useTaskStore();
+  const { tasks, subjects, timerLogs, exportDataJSON, importDataJSON, resetAllData } = useTaskStore();
   const { users, currentUserId, signOut, updateCurrentUserName, changePassword } = useAuthStore();
   const currentUser = users.find((u) => u.id === currentUserId);
+  const { currentStreak } = calculateStreak(timerLogs, tasks);
+  const completedTasksCount = tasks.filter((t) => t.status === 'Done').length;
 
   const fileInputRef = useRef(null);
   const avatarInputRef = useRef(null);
@@ -175,26 +179,6 @@ export default function Settings() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="clay-card p-6 flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">
-            App Settings
-          </h2>
-        </div>
-
-        <a
-          href="https://my-website-5lor.onrender.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600/10 via-indigo-500/15 to-violet-500/10 dark:from-blue-500/20 dark:via-indigo-500/20 dark:to-violet-500/20 hover:from-blue-600/20 hover:via-indigo-500/25 hover:to-violet-500/20 border border-indigo-200/60 dark:border-indigo-500/40 hover:border-indigo-400 dark:hover:border-indigo-400 shadow-sm hover:shadow-md text-xs sm:text-sm font-extrabold text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-white flex items-center gap-1.5 tracking-wide transition-all duration-200 active:scale-95 cursor-pointer"
-          title="Visit LHS Website"
-        >
-          <span>Build by LHS 🦅</span>
-          <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-        </a>
-      </div>
-
       {/* Feedback Alert */}
       {feedbackMsg && (
         <div className="clay-card p-4 bg-brand-teal/15 border border-brand-teal/40 text-brand-teal font-bold text-xs sm:text-sm flex items-center gap-2 animate-in fade-in">
@@ -203,121 +187,175 @@ export default function Settings() {
         </div>
       )}
 
-      {/* 1. Redesigned Profile & Persona with Upload Function */}
-      <div className="clay-card p-4 sm:p-7 space-y-6 relative overflow-hidden">
-        {/* Ambient background blur */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-teal/5 dark:bg-brand-teal/10 rounded-full blur-3xl pointer-events-none" />
+      {/* 1. Redesigned Profile Card */}
+      <div className="clay-card overflow-hidden relative">
+        {/* Hidden file input for avatar */}
+        <input
+          type="file"
+          ref={avatarInputRef}
+          onChange={handleAvatarFileChange}
+          accept="image/*"
+          className="hidden"
+        />
 
-        <div className="flex items-center justify-between">
-          <h3 className="text-base sm:text-lg font-extrabold text-slate-800 dark:text-white flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20">
+        {/* Gradient Banner Header */}
+        <div className="relative h-24 sm:h-28 bg-gradient-to-r from-blue-600/25 via-indigo-500/25 to-violet-600/30 dark:from-blue-600/30 dark:via-indigo-600/25 dark:to-violet-600/35 border-b border-white/30 dark:border-white/10 px-4 sm:px-7 pt-4 flex items-start justify-between">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-violet-500/20 blur-2xl" />
+            <div className="absolute -bottom-10 left-1/3 w-36 h-36 rounded-full bg-teal-400/20 blur-2xl" />
+          </div>
+
+          <h3 className="relative z-10 text-sm sm:text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
+            <span className="p-1.5 rounded-lg bg-white/60 dark:bg-slate-900/60 text-indigo-600 dark:text-indigo-300 border border-white/60 dark:border-white/10 shadow-xs">
               <User className="w-4 h-4" />
-            </div>
+            </span>
             <span>Profile & Persona</span>
           </h3>
 
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-teal-500/15 text-teal-600 dark:text-teal-300 border border-teal-500/30">
+          <span className="relative z-10 text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 backdrop-blur-md">
             Active Student
           </span>
         </div>
 
-        {/* Profile Card Main Layout: Avatar Uploader on Left, Details on Right */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-          {/* Avatar Upload Container */}
-          <div className="md:col-span-5 flex flex-col items-center text-center p-4 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 shadow-sm">
-            {/* Hidden file input */}
-            <input
-              type="file"
-              ref={avatarInputRef}
-              onChange={handleAvatarFileChange}
-              accept="image/*"
-              className="hidden"
-            />
+        {/* Profile Body */}
+        <div className="px-4 sm:px-7 pb-5 sm:pb-7">
+          {/* Overlapping Avatar + Identity & Stats Row */}
+          <div className="-mt-12 sm:-mt-14 flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 border-b border-slate-200/70 dark:border-slate-800/80">
+            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+              {/* Interactive Avatar with Drag & Drop */}
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => avatarInputRef.current?.click()}
+                className={`relative group cursor-pointer w-24 h-24 sm:w-28 sm:h-28 rounded-3xl p-1 transition-all duration-300 shrink-0 ${
+                  isDragging
+                    ? 'ring-4 ring-brand-teal scale-105 bg-brand-teal/20'
+                    : 'bg-gradient-to-tr from-blue-600 via-indigo-500 to-violet-500 shadow-xl hover:scale-[1.03]'
+                }`}
+              >
+                <div className="w-full h-full rounded-[20px] overflow-hidden bg-slate-900 ring-2 ring-white/90 dark:ring-slate-900 relative">
+                  <img
+                    src={userAvatar || DEFAULT_AVATAR}
+                    alt={userName}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-white">
+                    <Camera className="w-5 h-5 text-indigo-300" />
+                    <span className="text-[10px] font-bold">Change</span>
+                  </div>
+                </div>
 
-            {/* Interactive Avatar Frame with Drag & Drop */}
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => avatarInputRef.current?.click()}
-              className={`relative group cursor-pointer w-28 h-28 sm:w-32 sm:h-32 rounded-3xl p-1.5 transition-all duration-300 ${
-                isDragging
-                  ? 'ring-4 ring-brand-teal scale-105 bg-brand-teal/20'
-                  : 'bg-gradient-to-tr from-teal-400 via-indigo-500 to-purple-600 shadow-lg hover:shadow-xl hover:scale-102'
-              }`}
-            >
-              <div className="w-full h-full rounded-2xl overflow-hidden bg-slate-900 relative">
-                <img
-                  src={userAvatar || '/assets/student_avatar.jpg'}
-                  alt={userName}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-
-                {/* Hover overlay with Camera icon */}
-                <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-white">
-                  <Camera className="w-6 h-6 text-teal-300" />
-                  <span className="text-[10px] font-bold tracking-wide">Upload Photo</span>
+                <div className="absolute -bottom-1 -right-1 p-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-md border-2 border-white dark:border-slate-900">
+                  <Camera className="w-3.5 h-3.5" />
                 </div>
               </div>
 
-              {/* Camera icon badge */}
-              <div className="absolute -bottom-1 -right-1 p-2 rounded-xl bg-teal-500 text-white shadow-md border-2 border-white dark:border-slate-800 group-hover:scale-110 transition-transform">
-                <Camera className="w-3.5 h-3.5" />
+              {/* Display Name, Email & Mini Badges */}
+              <div className="space-y-1.5 pb-0.5">
+                <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                  {userName || 'Student'}
+                </h4>
+                {currentUser?.email && (
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center justify-center sm:justify-start gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>{currentUser.email}</span>
+                  </p>
+                )}
+
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 pt-1">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-lg neu-inset text-amber-600 dark:text-amber-300">
+                    <Flame className="w-3 h-3" />
+                    {currentStreak}d Streak
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-lg neu-inset text-emerald-600 dark:text-emerald-300">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {completedTasksCount} Done
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-lg neu-inset text-indigo-600 dark:text-indigo-300">
+                    <BookMarked className="w-3 h-3" />
+                    {subjects.length} Subjects
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Upload Buttons */}
-            <div className="w-full mt-4 space-y-2">
+            {/* Compact Photo & Website Actions */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 shrink-0">
+              <a
+                href="https://my-website-5lor.onrender.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600/10 via-indigo-500/15 to-violet-500/10 dark:from-blue-500/20 dark:via-indigo-500/20 dark:to-violet-500/20 hover:from-blue-600/20 hover:via-indigo-500/25 hover:to-violet-500/20 border border-indigo-200/60 dark:border-indigo-500/40 hover:border-indigo-400 shadow-sm text-xs font-extrabold text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-white flex items-center gap-1.5 transition-all active:scale-95"
+                title="Visit LHS Website"
+              >
+                <span>Build by LHS 🦅</span>
+                <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              </a>
+
               <button
                 type="button"
                 onClick={() => avatarInputRef.current?.click()}
-                className="w-full py-2 px-3 rounded-xl neu-teal-btn text-xs font-bold flex items-center justify-center gap-2 shadow"
+                className="neu-pill-btn px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-300"
               >
-                <UploadCloud className="w-4 h-4" />
-                <span>Upload New Photo</span>
+                <UploadCloud className="w-3.5 h-3.5 text-indigo-500" />
+                <span>Upload Photo</span>
               </button>
 
               {isCustomUploadedAvatar && (
                 <button
                   type="button"
                   onClick={handleResetAvatar}
-                  className="w-full py-1.5 px-3 rounded-xl text-slate-500 hover:text-red-500 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
+                  className="p-2 rounded-xl neu-pill-btn text-slate-400 hover:text-rose-500 transition-colors"
+                  title="Remove Custom Photo"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>Remove Custom Photo</span>
                 </button>
               )}
             </div>
           </div>
 
-          {/* Form: Name */}
-          <div className="md:col-span-7 flex flex-col justify-center h-full">
-            <form onSubmit={handleSaveProfile} className="space-y-4">
-              <div>
+          {/* Profile Form */}
+          <form onSubmit={handleSaveProfile} className="mt-5 grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-end">
+            <div className={currentUser?.email ? 'sm:col-span-5' : 'sm:col-span-9'}>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-indigo-500" />
+                <span>Display Name</span>
+              </label>
+              <input
+                type="text"
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value)}
+                placeholder="Enter your name"
+                className="w-full px-3.5 py-2.5 rounded-xl neu-inset border border-slate-200/80 dark:border-slate-700/80 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+              />
+            </div>
+
+            {currentUser?.email && (
+              <div className="sm:col-span-4">
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-teal-500" />
-                  <span>Your Name</span>
+                  <Mail className="w-3.5 h-3.5 text-indigo-500" />
+                  <span>Account Email</span>
                 </label>
                 <input
-                  type="text"
-                  value={profileName}
-                  onChange={(e) => setProfileName(e.target.value)}
-                  placeholder="Enter your name"
-                  className="w-full px-4 py-2.5 rounded-xl neu-inset border border-slate-200/80 dark:border-slate-700/80 text-sm font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+                  type="email"
+                  readOnly
+                  value={currentUser.email}
+                  className="w-full px-3.5 py-2.5 rounded-xl neu-inset border border-slate-200/60 dark:border-slate-700/60 text-sm font-medium text-slate-500 dark:text-slate-400 focus:outline-none cursor-default"
                 />
               </div>
+            )}
 
-              <div className="pt-2">
-                <button 
-                  type="submit" 
-                  className="neu-teal-btn px-6 py-2.5 text-xs font-extrabold shadow flex items-center justify-center gap-2 w-full sm:w-auto"
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Save Profile</span>
-                </button>
-              </div>
-            </form>
-          </div>
+            <div className="sm:col-span-3">
+              <button
+                type="submit"
+                className="w-full neu-teal-btn px-5 py-2.5 text-xs font-extrabold shadow flex items-center justify-center gap-2 rounded-xl"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Save Profile</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 

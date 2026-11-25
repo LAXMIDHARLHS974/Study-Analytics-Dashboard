@@ -17,8 +17,6 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingUp,
-  Target,
-  Sparkles,
   CheckCircle2,
   Loader2,
   XCircle,
@@ -110,8 +108,6 @@ export default function Analytics() {
     const safeLogs = Array.isArray(timerLogs) ? timerLogs : [];
 
     const periodStart = subDays(today, PERIOD_DAYS - 1);
-    const prevStart = subDays(today, PERIOD_DAYS * 2 - 1);
-    const prevEnd = subDays(today, PERIOD_DAYS);
 
     const inCurrentPeriod = (dateStr) => {
       if (!dateStr) return false;
@@ -122,20 +118,6 @@ export default function Analytics() {
         return false;
       }
     };
-
-    const inPrevPeriod = (dateStr) => {
-      if (!dateStr) return false;
-      try {
-        const d = startOfDay(parseISO(dateStr));
-        return d >= prevStart && d <= prevEnd;
-      } catch {
-        return false;
-      }
-    };
-
-    let currentHours = 0;
-    let prevHours = 0;
-    let activeDaysCur = 0;
 
     // Canonical subject map from existing subjects only (deleted subjects excluded)
     const canonicalSubjects = new Map();
@@ -155,10 +137,7 @@ export default function Analytics() {
 
     safeLogs.forEach((log) => {
       if (!log || !log.date) return;
-      const hrs = getGenuineLogHours(log);
       if (inCurrentPeriod(log.date)) {
-        currentHours += hrs;
-        if (hrs > 0 || log.tasksCompleted > 0 || log.visited) activeDaysCur++;
         if (log.subjectBreakdown && typeof log.subjectBreakdown === 'object') {
           Object.entries(log.subjectBreakdown).forEach(([name, h]) => {
             const key = (name || '').trim().toLowerCase();
@@ -167,18 +146,8 @@ export default function Analytics() {
             }
           });
         }
-      } else if (inPrevPeriod(log.date)) {
-        prevHours += hrs;
       }
     });
-
-    currentHours = Number(currentHours.toFixed(1));
-    prevHours = Number(prevHours.toFixed(1));
-
-    const hoursDeltaPct =
-      prevHours > 0
-        ? Number((((currentHours - prevHours) / prevHours) * 100).toFixed(1))
-        : null;
 
     // Task stats in period
     const periodTasks = safeTasks.filter((t) => inCurrentPeriod(t.date));
@@ -188,9 +157,8 @@ export default function Analytics() {
     const totalTasks = periodTasks.length;
     const completionRate = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
 
-    // Streak & consistency stats
-    const { currentStreak, bestStreak } = calculateStreak(safeLogs, safeTasks);
-    const focusRate = Math.min(100, Math.round((activeDaysCur / PERIOD_DAYS) * 100));
+    // Streak stats
+    const { bestStreak } = calculateStreak(safeLogs, safeTasks);
 
     // Build daily series for Study Time Trend
     const trendSeries = [];
@@ -227,16 +195,12 @@ export default function Analytics() {
       .sort((a, b) => b.hours - a.hours);
 
     return {
-      currentHours,
-      hoursDeltaPct,
       doneTasks,
       inProgressTasks,
       pendingTasks,
       totalTasks,
       completionRate,
-      currentStreak,
       bestStreak,
-      focusRate,
       trendSeries,
       subjectItems,
       subjectTotalHours,
@@ -552,10 +516,10 @@ export default function Analytics() {
         </div>
       </div>
 
-      {/* 2. Bottom Row: Subject Wise Study Time, Task Completion, Study Insights */}
+      {/* 2. Bottom Row: Subject Wise Study Time & Task Completion */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         {/* Subject Wise Study Time */}
-        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-5">
+        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-6">
           <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
             <div className="flex items-center gap-2 min-w-0">
               <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25 shrink-0">
@@ -663,7 +627,7 @@ export default function Analytics() {
         </div>
 
         {/* Task Completion */}
-        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-4">
+        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-6">
           <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
             <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25 shrink-0">
               <CheckSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -733,64 +697,6 @@ export default function Analytics() {
                 </span>
                 <span className="font-extrabold text-slate-800 dark:text-white">
                   {analyticsData.pendingTasks}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Study Insights */}
-        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-3">
-          <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
-            <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25 shrink-0">
-              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </div>
-            <h3 className="text-xs sm:text-base font-extrabold text-slate-800 dark:text-white">
-              Study Insights
-            </h3>
-          </div>
-
-          <div className="space-y-1.5 sm:space-y-2.5 flex-1 flex flex-col justify-center">
-            <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl neu-inset flex items-center gap-2 sm:gap-2.5">
-              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 shrink-0" />
-              <div className="min-w-0 text-[11px] sm:text-xs">
-                <span className="font-extrabold text-emerald-600 dark:text-emerald-400 mr-1.5">
-                  {analyticsData.hoursDeltaPct !== null
-                    ? `${analyticsData.hoursDeltaPct >= 0 ? '+' : ''}${analyticsData.hoursDeltaPct}%`
-                    : `${analyticsData.currentHours}h`}
-                </span>
-                <span className="text-slate-600 dark:text-slate-300">
-                  {analyticsData.hoursDeltaPct !== null
-                    ? 'Study time vs previous 30 days.'
-                    : 'Total study time logged in last 30 days.'}
-                </span>
-              </div>
-            </div>
-
-            <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl neu-inset flex items-center gap-2 sm:gap-2.5">
-              <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 shrink-0" />
-              <div className="min-w-0 text-[11px] sm:text-xs">
-                <span className="font-extrabold text-amber-600 dark:text-amber-400 mr-1.5">
-                  {analyticsData.currentStreak} Days
-                </span>
-                <span className="text-slate-600 dark:text-slate-300">
-                  {analyticsData.currentStreak > 0
-                    ? 'You are on an active study streak! Keep it up!'
-                    : 'Complete a task today to start your streak!'}
-                </span>
-              </div>
-            </div>
-
-            <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl neu-inset flex items-center gap-2 sm:gap-2.5">
-              <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-500 shrink-0" />
-              <div className="min-w-0 text-[11px] sm:text-xs">
-                <span className="font-extrabold text-sky-600 dark:text-sky-400 mr-1.5">
-                  {analyticsData.focusRate}%
-                </span>
-                <span className="text-slate-600 dark:text-slate-300">
-                  {analyticsData.focusRate >= 75
-                    ? 'Your consistency rate is excellent.'
-                    : 'Steady daily sessions will boost your focus rate.'}
                 </span>
               </div>
             </div>

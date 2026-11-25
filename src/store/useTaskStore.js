@@ -430,6 +430,29 @@ export const useTaskStore = create(
               t.subjectId !== id &&
               (!targetName || (t.subject || '').trim().toLowerCase() !== targetName)
           ),
+          timerLogs: (state.timerLogs || []).map((log) => {
+            if (!log || !log.subjectBreakdown || typeof log.subjectBreakdown !== 'object') {
+              return log;
+            }
+            const nextBreakdown = {};
+            let nextHours = 0;
+            let removed = false;
+            Object.entries(log.subjectBreakdown).forEach(([name, hours]) => {
+              if (targetName && (name || '').trim().toLowerCase() === targetName) {
+                removed = true;
+                return;
+              }
+              const h = Number(hours) || 0;
+              nextBreakdown[name] = h;
+              nextHours += h;
+            });
+            if (!removed) return log;
+            return {
+              ...log,
+              hours: Number(nextHours.toFixed(2)),
+              subjectBreakdown: nextBreakdown,
+            };
+          }),
         }));
       },
 

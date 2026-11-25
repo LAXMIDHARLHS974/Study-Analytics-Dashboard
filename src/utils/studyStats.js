@@ -295,21 +295,10 @@ export const calculateSubjectDistribution = (timerLogs = [], subjects = [], time
       Object.entries(log.subjectBreakdown).forEach(([name, hours]) => {
         const cleanName = (name || '').trim();
         const lowerKey = cleanName.toLowerCase();
-        if (!cleanName) return;
+        if (!cleanName || !canonicalMap.has(lowerKey)) return;
 
         const h = Number(hours) || 0;
         hoursByLowerKey[lowerKey] = (hoursByLowerKey[lowerKey] || 0) + h;
-
-        // If not in canonicalMap, add as a detected genuine subject
-        if (!canonicalMap.has(lowerKey)) {
-          canonicalMap.set(lowerKey, {
-            id: `subj-${lowerKey.replace(/\s+/g, '-')}`,
-            name: cleanName,
-            color: defaultColors[colorIdx++ % defaultColors.length],
-            code: cleanName.substring(0, 4).toUpperCase(),
-            targetHoursWeekly: 8,
-          });
-        }
       });
     }
   });

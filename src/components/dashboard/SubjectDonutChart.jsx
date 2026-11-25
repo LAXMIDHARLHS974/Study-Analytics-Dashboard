@@ -41,13 +41,17 @@ export default function SubjectDonutChart() {
     activeCount,
   } = calculateSubjectDistribution(timerLogs, subjects, timeFilter);
 
+  const chartData = totalHours > 0
+    ? activeDistribution
+    : distribution.map((d) => ({ ...d, chartValue: 1 }));
+
   // Center display content
   const centerTitle = hoveredEntry
     ? `${hoveredEntry.hours}h`
     : `${totalHours}h`;
   const centerSubtitle = hoveredEntry
     ? hoveredEntry.name
-    : `${activeCount} ${activeCount === 1 ? 'Subject' : 'Subjects'}`;
+    : `${distribution.length} ${distribution.length === 1 ? 'Subject' : 'Subjects'}`;
 
   return (
     <div className="clay-card p-4 sm:p-5 flex flex-col justify-between h-full shadow-neu-card">
@@ -87,25 +91,20 @@ export default function SubjectDonutChart() {
               <PieChart>
                 <Tooltip content={<CustomDonutTooltip />} />
                 <Pie
-                  data={
-                    totalHours > 0
-                      ? activeDistribution
-                      : distribution.map((d) => ({ ...d, chartValue: 1 }))
-                  }
+                  data={chartData}
                   cx="50%"
                   cy="50%"
                   innerRadius={38}
                   outerRadius={62}
-                  paddingAngle={distribution.length > 1 ? 4 : 0}
+                  paddingAngle={chartData.length > 1 ? 4 : 0}
                   dataKey={totalHours > 0 ? 'hours' : 'chartValue'}
                   stroke="none"
                   onMouseEnter={(_, index) => {
-                    const list = totalHours > 0 ? activeDistribution : distribution;
-                    setHoveredEntry(list[index]);
+                    setHoveredEntry(chartData[index]);
                   }}
                   onMouseLeave={() => setHoveredEntry(null)}
                 >
-                  {(totalHours > 0 ? activeDistribution : distribution).map((entry, index) => (
+                  {chartData.map((entry, index) => (
                     <Cell
                       key={`cell-${entry.name}-${index}`}
                       fill={entry.color}
@@ -129,7 +128,7 @@ export default function SubjectDonutChart() {
                 {centerTitle}
               </span>
               <span className="text-[9px] text-slate-500 font-bold uppercase truncate max-w-[80px]">
-                {hoveredEntry ? hoveredEntry.name : `${distribution.length} ${distribution.length === 1 ? 'Subject' : 'Subjects'}`}
+                {centerSubtitle}
               </span>
             </div>
           </div>

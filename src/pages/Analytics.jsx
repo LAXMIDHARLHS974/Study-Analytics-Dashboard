@@ -344,31 +344,31 @@ export default function Analytics() {
       : [{ name: 'No Tasks', value: 1, color: '#475569' }];
 
   return (
-    <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-300 pb-6">
+    <div className="space-y-3 sm:space-y-5 animate-in fade-in duration-300 pb-6">
       {/* 1. Top Row: Study Consistency Heatmap & Study Time Trend */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         {/* Study Consistency Heatmap */}
-        <div className="clay-card p-4 sm:p-5 flex flex-col justify-between lg:col-span-6">
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25">
-                <CalendarDays className="w-4 h-4" />
+        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-6">
+          <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25 shrink-0">
+                <CalendarDays className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <h3 className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white">
+              <h3 className="text-xs sm:text-base font-extrabold text-slate-800 dark:text-white truncate">
                 Study Consistency Heatmap
               </h3>
             </div>
 
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-xl neu-inset text-xs font-bold text-slate-700 dark:text-slate-200">
+            <div className="flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-lg sm:rounded-xl neu-inset text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 shrink-0">
               <button
                 type="button"
                 onClick={() => setHeatmapMonth((m) => addMonths(m, -1))}
                 className="p-1 rounded-md hover:bg-white/40 dark:hover:bg-white/10 transition-colors"
                 aria-label="Previous month"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <ChevronLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
-              <span className="min-w-[74px] text-center">
+              <span className="min-w-[60px] sm:min-w-[74px] text-center">
                 {format(heatmapMonth, 'MMM yyyy')}
               </span>
               <button
@@ -377,16 +377,16 @@ export default function Analytics() {
                 className="p-1 rounded-md hover:bg-white/40 dark:hover:bg-white/10 transition-colors"
                 aria-label="Next month"
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 items-center">
             {/* Calendar Matrix */}
-            <div className="sm:col-span-7 space-y-2.5 overflow-x-auto">
-              <div className="flex items-start gap-2">
-                <div className="grid grid-rows-7 gap-1.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 pt-0.5 shrink-0">
+            <div className="sm:col-span-7 space-y-2 overflow-x-auto">
+              <div className="flex items-start gap-2 sm:gap-2.5 justify-center sm:justify-start">
+                <div className="grid grid-rows-7 gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] font-semibold text-slate-500 dark:text-slate-400 shrink-0">
                   {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
                     <span key={d} className="h-5 sm:h-6 flex items-center">
                       {d}
@@ -395,13 +395,13 @@ export default function Analytics() {
                 </div>
 
                 <div
-                  className="grid gap-1.5 flex-1"
+                  className="grid gap-1 sm:gap-1.5 sm:flex-1"
                   style={{
-                    gridTemplateColumns: `repeat(${monthHeatmap.weeks.length}, minmax(18px, 1fr))`,
+                    gridTemplateColumns: `repeat(${monthHeatmap.weeks.length}, minmax(20px, 26px))`,
                   }}
                 >
                   {monthHeatmap.weeks.map((week, wIdx) => (
-                    <div key={wIdx} className="grid grid-rows-7 gap-1.5">
+                    <div key={wIdx} className="grid grid-rows-7 gap-1 sm:gap-1.5">
                       {week.map((day) => {
                         const dateStr = format(day, 'yyyy-MM-dd');
                         const log = logMap[dateStr];
@@ -410,7 +410,7 @@ export default function Analytics() {
                           <div
                             key={dateStr}
                             title={`${format(day, 'MMM d, yyyy')} • ${hrs}h studied`}
-                            className={`h-5 sm:h-6 rounded-md transition-transform hover:scale-110 ${getHeatCellClass(
+                            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-[5px] sm:rounded-md transition-transform hover:scale-110 ${getHeatCellClass(
                               day
                             )}`}
                           />
@@ -421,58 +421,58 @@ export default function Analytics() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 pt-1">
+              <div className="flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 pt-0.5">
                 <span>Less Activity</span>
                 <div className="flex items-center gap-1">
-                  <span className="w-3 h-3 rounded-sm bg-slate-200/80 dark:bg-slate-800/70 border border-slate-300/40 dark:border-white/5" />
-                  <span className="w-3 h-3 rounded-sm bg-violet-300/70 dark:bg-violet-800/70" />
-                  <span className="w-3 h-3 rounded-sm bg-violet-400/80 dark:bg-violet-600/80" />
-                  <span className="w-3 h-3 rounded-sm bg-purple-500 dark:bg-purple-400" />
+                  <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-slate-200/80 dark:bg-slate-800/70 border border-slate-300/40 dark:border-white/5" />
+                  <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-violet-300/70 dark:bg-violet-800/70" />
+                  <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-violet-400/80 dark:bg-violet-600/80" />
+                  <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-purple-500 dark:bg-purple-400" />
                 </div>
                 <span>More Activity (5h+)</span>
               </div>
             </div>
 
-            {/* 3 Right Mini Stats */}
-            <div className="sm:col-span-5 space-y-2.5">
-              <div className="p-2.5 rounded-xl neu-inset flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-500 dark:text-sky-300 flex items-center justify-center shrink-0">
-                  <CalendarDays className="w-4 h-4" />
+            {/* 3 Mini Stats: compact 3-col grid on mobile, vertical stack on sm+ */}
+            <div className="sm:col-span-5 grid grid-cols-3 sm:grid-cols-1 gap-1.5 sm:gap-2.5">
+              <div className="p-2 sm:p-2.5 rounded-xl neu-inset flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-sky-500/20 text-sky-500 dark:text-sky-300 flex items-center justify-center shrink-0">
+                  <CalendarDays className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
-                <div className="min-w-0">
-                  <span className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                    Most Consistent Day
+                <div className="min-w-0 w-full">
+                  <span className="block text-[9px] sm:text-[10px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+                    Best Day
                   </span>
-                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-white truncate block">
+                  <span className="text-[11px] sm:text-sm font-extrabold text-slate-800 dark:text-white truncate block">
                     {monthHeatmap.bestDayText}
                   </span>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-xl neu-inset flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-500 dark:text-amber-300 flex items-center justify-center shrink-0">
-                  <Flame className="w-4 h-4" />
+              <div className="p-2 sm:p-2.5 rounded-xl neu-inset flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500/20 text-amber-500 dark:text-amber-300 flex items-center justify-center shrink-0">
+                  <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
-                <div className="min-w-0">
-                  <span className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                <div className="min-w-0 w-full">
+                  <span className="block text-[9px] sm:text-[10px] font-semibold text-slate-500 dark:text-slate-400 truncate">
                     Longest Streak
                   </span>
-                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-white">
+                  <span className="text-[11px] sm:text-sm font-extrabold text-slate-800 dark:text-white truncate block">
                     {analyticsData.bestStreak}{' '}
                     {analyticsData.bestStreak === 1 ? 'Day' : 'Days'}
                   </span>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-xl neu-inset flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-violet-500/20 text-violet-500 dark:text-violet-300 flex items-center justify-center shrink-0">
-                  <BarChart3 className="w-4 h-4" />
+              <div className="p-2 sm:p-2.5 rounded-xl neu-inset flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-violet-500/20 text-violet-500 dark:text-violet-300 flex items-center justify-center shrink-0">
+                  <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
-                <div className="min-w-0">
-                  <span className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                    Avg. Daily Study
+                <div className="min-w-0 w-full">
+                  <span className="block text-[9px] sm:text-[10px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+                    Avg. Study
                   </span>
-                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-white">
+                  <span className="text-[11px] sm:text-sm font-extrabold text-slate-800 dark:text-white truncate block">
                     {monthHeatmap.avgDailyText}
                   </span>
                 </div>
@@ -482,13 +482,13 @@ export default function Analytics() {
         </div>
 
         {/* Study Time Trend AreaChart */}
-        <div className="clay-card p-4 sm:p-5 flex flex-col justify-between lg:col-span-6">
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25">
-                <TrendingUp className="w-4 h-4" />
+        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-6">
+          <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25 shrink-0">
+                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <h3 className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white">
+              <h3 className="text-xs sm:text-base font-extrabold text-slate-800 dark:text-white truncate">
                 Study Time Trend
               </h3>
             </div>
@@ -496,7 +496,7 @@ export default function Analytics() {
             <select
               value={trendMetric}
               onChange={(e) => setTrendMetric(e.target.value)}
-              className="text-xs font-bold px-3 py-1.5 rounded-xl neu-inset text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
+              className="text-[11px] sm:text-xs font-bold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl neu-inset text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer shrink-0"
             >
               <option value="hours" className="bg-slate-800 text-white">
                 Study Hours
@@ -507,11 +507,11 @@ export default function Analytics() {
             </select>
           </div>
 
-          <div className="h-52 sm:h-60 w-full">
+          <div className="h-40 sm:h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={analyticsData.trendSeries}
-                margin={{ top: 12, right: 10, left: -20, bottom: 0 }}
+                margin={{ top: 10, right: 8, left: -24, bottom: 0 }}
               >
                 <defs>
                   <linearGradient id="studyTrendGrad" x1="0" y1="0" x2="0" y2="1">
@@ -525,7 +525,7 @@ export default function Analytics() {
                   axisLine={false}
                   tickLine={false}
                   minTickGap={24}
-                  tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 600 }}
+                  tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 600 }}
                 />
                 <YAxis
                   axisLine={false}
@@ -543,7 +543,7 @@ export default function Analytics() {
                   strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#studyTrendGrad)"
-                  dot={{ r: 3, fill: '#E9D5FF', stroke: '#A855F7', strokeWidth: 2 }}
+                  dot={{ r: 2.5, fill: '#E9D5FF', stroke: '#A855F7', strokeWidth: 1.5 }}
                   activeDot={{ r: 5, fill: '#FFFFFF', stroke: '#A855F7', strokeWidth: 2.5 }}
                 />
               </AreaChart>
@@ -553,24 +553,24 @@ export default function Analytics() {
       </div>
 
       {/* 2. Bottom Row: Subject Wise Study Time, Task Completion, Study Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         {/* Subject Wise Study Time */}
-        <div className="clay-card p-4 sm:p-5 flex flex-col justify-between lg:col-span-5">
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25">
-                <Users className="w-4 h-4" />
+        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-5">
+          <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25 shrink-0">
+                <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <h3 className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white">
+              <h3 className="text-xs sm:text-base font-extrabold text-slate-800 dark:text-white truncate">
                 Subject Wise Study Time
               </h3>
             </div>
 
-            <div className="flex items-center p-0.5 rounded-xl neu-inset text-[11px] font-bold">
+            <div className="flex items-center p-0.5 rounded-lg sm:rounded-xl neu-inset text-[10px] sm:text-[11px] font-bold shrink-0">
               <button
                 type="button"
                 onClick={() => setSubjectUnit('percent')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
+                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg transition-all ${
                   subjectUnit === 'percent'
                     ? 'bg-violet-600 text-white shadow-xs'
                     : 'text-slate-500 dark:text-slate-400'
@@ -581,7 +581,7 @@ export default function Analytics() {
               <button
                 type="button"
                 onClick={() => setSubjectUnit('hours')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
+                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg transition-all ${
                   subjectUnit === 'hours'
                     ? 'bg-violet-600 text-white shadow-xs'
                     : 'text-slate-500 dark:text-slate-400'
@@ -593,8 +593,8 @@ export default function Analytics() {
           </div>
 
           {analyticsData.subjectItems.length > 0 ? (
-            <div className="flex flex-col sm:flex-row items-center gap-4 flex-1">
-              <div className="w-40 h-40 relative shrink-0">
+            <div className="flex flex-row items-center gap-3 sm:gap-4 flex-1">
+              <div className="w-28 h-28 sm:w-40 sm:h-40 relative shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Tooltip content={<SubjectTooltip mode={subjectUnit} />} />
@@ -602,8 +602,8 @@ export default function Analytics() {
                       data={subjectPieData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={44}
-                      outerRadius={68}
+                      innerRadius="62%"
+                      outerRadius="92%"
                       paddingAngle={subjectPieData.length > 1 ? 3 : 0}
                       dataKey={analyticsData.subjectTotalHours > 0 ? 'hours' : 'chartValue'}
                       stroke="none"
@@ -619,35 +619,35 @@ export default function Analytics() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                  <span className="text-sm font-extrabold text-slate-800 dark:text-white">
+                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-white">
                     {analyticsData.subjectTotalHours} h
                   </span>
-                  <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                  <span className="text-[9px] sm:text-[10px] font-semibold text-slate-500 dark:text-slate-400">
                     Total
                   </span>
                 </div>
               </div>
 
-              <div className="w-full flex-1 space-y-2 max-h-44 overflow-y-auto pr-1">
+              <div className="w-full flex-1 space-y-1 sm:space-y-2 max-h-32 sm:max-h-44 overflow-y-auto pr-1">
                 {analyticsData.subjectItems.map((item) => (
                   <div
                     key={item.id || item.name}
-                    className="flex items-center justify-between text-xs py-1 px-2 rounded-lg hover:bg-slate-200/40 dark:hover:bg-white/5 transition-colors"
+                    className="flex items-center justify-between text-[11px] sm:text-xs py-1 px-1.5 sm:px-2 rounded-lg hover:bg-slate-200/40 dark:hover:bg-white/5 transition-colors"
                   >
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
                       <span
-                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0"
                         style={{ backgroundColor: item.color }}
                       />
                       <span className="font-semibold text-slate-700 dark:text-slate-200 truncate">
                         {item.name}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0 ml-2">
+                    <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-1.5 sm:ml-2">
                       <span className="font-bold text-slate-800 dark:text-white tabular-nums">
                         {item.hours} h
                       </span>
-                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 min-w-[30px] text-right tabular-nums">
+                      <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 min-w-[26px] sm:min-w-[30px] text-right tabular-nums">
                         {item.pct}%
                       </span>
                     </div>
@@ -656,33 +656,33 @@ export default function Analytics() {
               </div>
             </div>
           ) : (
-            <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+            <div className="py-6 text-center text-xs text-slate-500 dark:text-slate-400">
               No subjects added yet. Add subjects in the Subjects page to see breakdown.
             </div>
           )}
         </div>
 
         {/* Task Completion */}
-        <div className="clay-card p-4 sm:p-5 flex flex-col justify-between lg:col-span-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25">
-              <CheckSquare className="w-4 h-4" />
+        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-4">
+          <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
+            <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25 shrink-0">
+              <CheckSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
-            <h3 className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white">
+            <h3 className="text-xs sm:text-base font-extrabold text-slate-800 dark:text-white">
               Task Completion
             </h3>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 flex-1">
-            <div className="w-36 h-36 relative shrink-0">
+          <div className="flex flex-row items-center gap-3 sm:gap-4 flex-1">
+            <div className="w-28 h-28 sm:w-36 sm:h-36 relative shrink-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={taskRingData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={44}
-                    outerRadius={62}
+                    innerRadius="64%"
+                    outerRadius="90%"
                     startAngle={90}
                     endAngle={-270}
                     paddingAngle={taskRingData.length > 1 ? 3 : 0}
@@ -696,19 +696,19 @@ export default function Analytics() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                <span className="text-lg font-black text-slate-800 dark:text-white leading-tight">
+                <span className="text-sm sm:text-lg font-black text-slate-800 dark:text-white leading-tight">
                   {analyticsData.completionRate}%
                 </span>
-                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                   {analyticsData.doneTasks} / {analyticsData.totalTasks}
                 </span>
               </div>
             </div>
 
-            <div className="w-full flex-1 space-y-2">
-              <div className="p-2.5 rounded-xl neu-inset flex items-center justify-between text-xs">
-                <span className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            <div className="w-full flex-1 space-y-1.5 sm:space-y-2">
+              <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl neu-inset flex items-center justify-between text-[11px] sm:text-xs">
+                <span className="flex items-center gap-1.5 sm:gap-2 font-semibold text-slate-700 dark:text-slate-200">
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 shrink-0" />
                   Completed
                 </span>
                 <span className="font-extrabold text-slate-800 dark:text-white">
@@ -716,9 +716,9 @@ export default function Analytics() {
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-xl neu-inset flex items-center justify-between text-xs">
-                <span className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-200">
-                  <Loader2 className="w-4 h-4 text-amber-500" />
+              <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl neu-inset flex items-center justify-between text-[11px] sm:text-xs">
+                <span className="flex items-center gap-1.5 sm:gap-2 font-semibold text-slate-700 dark:text-slate-200">
+                  <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 shrink-0" />
                   In Progress
                 </span>
                 <span className="font-extrabold text-slate-800 dark:text-white">
@@ -726,9 +726,9 @@ export default function Analytics() {
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-xl neu-inset flex items-center justify-between text-xs">
-                <span className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-200">
-                  <XCircle className="w-4 h-4 text-rose-500" />
+              <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl neu-inset flex items-center justify-between text-[11px] sm:text-xs">
+                <span className="flex items-center gap-1.5 sm:gap-2 font-semibold text-slate-700 dark:text-slate-200">
+                  <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500 shrink-0" />
                   Pending
                 </span>
                 <span className="font-extrabold text-slate-800 dark:text-white">
@@ -740,26 +740,26 @@ export default function Analytics() {
         </div>
 
         {/* Study Insights */}
-        <div className="clay-card p-4 sm:p-5 flex flex-col justify-between lg:col-span-3">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25">
-              <Sparkles className="w-4 h-4" />
+        <div className="clay-card p-3.5 sm:p-5 flex flex-col justify-between lg:col-span-3">
+          <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
+            <div className="p-1.5 rounded-lg bg-violet-500/15 text-violet-600 dark:text-violet-300 border border-violet-500/25 shrink-0">
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
-            <h3 className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white">
+            <h3 className="text-xs sm:text-base font-extrabold text-slate-800 dark:text-white">
               Study Insights
             </h3>
           </div>
 
-          <div className="space-y-2.5 flex-1 flex flex-col justify-center">
-            <div className="p-2.5 rounded-xl neu-inset flex items-center gap-2.5">
-              <TrendingUp className="w-4 h-4 text-emerald-500 shrink-0" />
-              <div className="min-w-0 text-xs">
+          <div className="space-y-1.5 sm:space-y-2.5 flex-1 flex flex-col justify-center">
+            <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl neu-inset flex items-center gap-2 sm:gap-2.5">
+              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 shrink-0" />
+              <div className="min-w-0 text-[11px] sm:text-xs">
                 <span className="font-extrabold text-emerald-600 dark:text-emerald-400 mr-1.5">
                   {analyticsData.hoursDeltaPct !== null
                     ? `${analyticsData.hoursDeltaPct >= 0 ? '+' : ''}${analyticsData.hoursDeltaPct}%`
                     : `${analyticsData.currentHours}h`}
                 </span>
-                <span className="text-slate-600 dark:text-slate-300 text-[11px]">
+                <span className="text-slate-600 dark:text-slate-300">
                   {analyticsData.hoursDeltaPct !== null
                     ? 'Study time vs previous 30 days.'
                     : 'Total study time logged in last 30 days.'}
@@ -767,13 +767,13 @@ export default function Analytics() {
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl neu-inset flex items-center gap-2.5">
-              <Flame className="w-4 h-4 text-amber-500 shrink-0" />
-              <div className="min-w-0 text-xs">
+            <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl neu-inset flex items-center gap-2 sm:gap-2.5">
+              <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 shrink-0" />
+              <div className="min-w-0 text-[11px] sm:text-xs">
                 <span className="font-extrabold text-amber-600 dark:text-amber-400 mr-1.5">
                   {analyticsData.currentStreak} Days
                 </span>
-                <span className="text-slate-600 dark:text-slate-300 text-[11px]">
+                <span className="text-slate-600 dark:text-slate-300">
                   {analyticsData.currentStreak > 0
                     ? 'You are on an active study streak! Keep it up!'
                     : 'Complete a task today to start your streak!'}
@@ -781,13 +781,13 @@ export default function Analytics() {
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl neu-inset flex items-center gap-2.5">
-              <Target className="w-4 h-4 text-sky-500 shrink-0" />
-              <div className="min-w-0 text-xs">
+            <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl neu-inset flex items-center gap-2 sm:gap-2.5">
+              <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-500 shrink-0" />
+              <div className="min-w-0 text-[11px] sm:text-xs">
                 <span className="font-extrabold text-sky-600 dark:text-sky-400 mr-1.5">
                   {analyticsData.focusRate}%
                 </span>
-                <span className="text-slate-600 dark:text-slate-300 text-[11px]">
+                <span className="text-slate-600 dark:text-slate-300">
                   {analyticsData.focusRate >= 75
                     ? 'Your consistency rate is excellent.'
                     : 'Steady daily sessions will boost your focus rate.'}

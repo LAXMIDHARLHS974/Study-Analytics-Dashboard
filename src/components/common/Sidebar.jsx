@@ -10,9 +10,11 @@ import {
   BarChart3,
   Settings,
   Layers,
+  LogOut,
   X
 } from 'lucide-react';
 import { useSettingsStore } from '../../store/useSettingsStore';
+import { useAuthStore } from '../../store/useAuthStore';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -29,6 +31,8 @@ const navItems = [
 
 export default function Sidebar({ isOpen, onClose }) {
   const { userName, userAvatar } = useSettingsStore();
+  const { users, currentUserId, signOut } = useAuthStore();
+  const currentUser = users.find((u) => u.id === currentUserId);
 
   return (
     <aside
@@ -68,6 +72,11 @@ export default function Sidebar({ isOpen, onClose }) {
           <span>Hi, {userName}!</span>
           <span className="text-amber-500 dark:text-violet-400 text-xs sm:text-sm">✨</span>
         </h2>
+        {currentUser?.email && (
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-full px-2">
+            {currentUser.email}
+          </p>
+        )}
       </div>
 
       {/* Navigation List with High-Contrast Liquid Glass States */}
@@ -104,6 +113,23 @@ export default function Sidebar({ isOpen, onClose }) {
           );
         })}
       </nav>
+
+      {/* Sign Out Button */}
+      <div className="pt-2.5 border-t border-slate-200/80 dark:border-slate-800">
+        <button
+          type="button"
+          onClick={() => {
+            onClose && onClose();
+            signOut();
+          }}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors"
+        >
+          <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center bg-rose-500/10">
+            <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </div>
+          <span>Sign Out</span>
+        </button>
+      </div>
     </aside>
   );
 }

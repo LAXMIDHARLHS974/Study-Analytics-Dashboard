@@ -11,10 +11,14 @@ import {
   Camera,
   Trash2,
   UploadCloud,
-  ExternalLink
+  ExternalLink,
+  Lock,
+  LogOut,
+  Mail
 } from 'lucide-react';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useTaskStore } from '../store/useTaskStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 const DEFAULT_AVATAR = '/assets/student_avatar.jpg';
 
@@ -26,6 +30,8 @@ export default function Settings() {
   } = useSettingsStore();
 
   const { exportDataJSON, importDataJSON, resetAllData } = useTaskStore();
+  const { users, currentUserId, signOut, updateCurrentUserName, changePassword } = useAuthStore();
+  const currentUser = users.find((u) => u.id === currentUserId);
 
   const fileInputRef = useRef(null);
   const avatarInputRef = useRef(null);
@@ -33,6 +39,9 @@ export default function Settings() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordMsg, setPasswordMsg] = useState('');
 
   // Client-side image processor for avatar upload
   const processImageFile = (file) => {
@@ -116,8 +125,23 @@ export default function Settings() {
   const handleSaveProfile = (e) => {
     e.preventDefault();
     updateProfile({ userName: profileName });
+    updateCurrentUserName(profileName);
     setFeedbackMsg('Profile updated successfully! ✨');
     setTimeout(() => setFeedbackMsg(''), 3000);
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPasswordMsg('');
+    const res = await changePassword({ currentPassword, newPassword });
+    if (res.success) {
+      setCurrentPassword('');
+      setNewPassword('');
+      setPasswordMsg('Password updated successfully!');
+      setTimeout(() => setPasswordMsg(''), 3000);
+    } else {
+      setPasswordMsg(res.error || 'Could not update password.');
+    }
   };
 
   const handleFileImport = (e) => {
@@ -339,6 +363,64 @@ export default function Settings() {
             <span>Reset All Data</span>
           </button>
         </div>
+      </div>
+
+      {/* 3. Account & Security */}
+      <div className="clay-card p-4 sm:p-6 space-y-4 border border-slate-300/60 dark:border-slate-700/60">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">
+              <Lock className="w-4 h-4 text-violet-500" />
+              <span>Account & Security</span>
+            </h3>
+            {currentUser?.email && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-1">
+                <Mail className="w-3.5 h-3.5" />
+                <span>Signed in as {currentUser.email}</span>
+              </p>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={signOut}
+            className="px-4 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-600 dark:text-rose-300 hover:text-white border border-rose-500/30 text-xs font-bold flex items-center justify-center gap-2 transition-colors self-start sm:self-auto"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </button>
+        </div>
+
+        <form onSubmit={handleChangePassword} className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200/60 dark:border-slate-800">
+          <input
+            type="password"
+            required
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder="Current password"
+            className="px-3.5 py-2 rounded-xl neu-inset border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none"
+          />
+          <input
+            type="password"
+            required
+            minLength={6}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="New password (min 6 chars)"
+            className="px-3.5 py-2 rounded-xl neu-inset border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="neu-teal-btn px-4 py-2 text-xs font-bold shadow flex items-center justify-center gap-1.5"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Update Password</span>
+          </button>
+        </form>
+
+        {passwordMsg && (
+          <p className="text-xs font-bold text-brand-teal">{passwordMsg}</p>
+        )}
       </div>
 
       {/* Reset Confirmation Dialog Modal */}

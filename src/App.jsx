@@ -19,6 +19,8 @@ import Settings from './pages/Settings';
 import { Home, Compass, BarChart3, User } from 'lucide-react';
 import { useTaskStore } from './store/useTaskStore';
 import { useSettingsStore } from './store/useSettingsStore';
+import { useAuthStore } from './store/useAuthStore';
+import AuthPage from './pages/AuthPage';
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -27,6 +29,7 @@ export default function App() {
 
   const recordDailyVisit = useTaskStore((state) => state.recordDailyVisit);
   const theme = useSettingsStore((state) => state.theme);
+  const currentUserId = useAuthStore((state) => state.currentUserId);
 
   // Synchronize theme with document root classList
   React.useEffect(() => {
@@ -37,12 +40,16 @@ export default function App() {
     }
   }, [theme]);
 
-  // Automatically record daily visit whenever the user opens/visits the website
+  // Automatically record daily visit whenever the signed-in user opens/visits the website
   React.useEffect(() => {
-    if (typeof recordDailyVisit === 'function') {
+    if (currentUserId && typeof recordDailyVisit === 'function') {
       recordDailyVisit();
     }
-  }, [recordDailyVisit]);
+  }, [currentUserId, recordDailyVisit]);
+
+  if (!currentUserId) {
+    return <AuthPage />;
+  }
 
   const handleOpenNewTask = (prefill = null) => {
     const isPrefillObj =

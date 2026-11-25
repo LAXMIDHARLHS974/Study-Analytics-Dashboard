@@ -145,22 +145,35 @@ export default function DailyRoutine() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header Card */}
-      <div className="clay-card p-5 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="text-center md:text-left">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">
-            Daily Routine Builder
-          </h2>
+      <div className="clay-card p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-3.5 sm:gap-4">
+        <div className="flex items-center justify-between md:block">
+          <div className="text-left">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">
+              Daily Routine Builder
+            </h2>
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 md:hidden">
+              {routines.length} {routines.length === 1 ? 'template' : 'templates'} • Tap a routine to customize
+            </p>
+          </div>
+
+          <button
+            onClick={() => openTemplateModal(null)}
+            className="md:hidden neu-teal-btn px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1 shrink-0 shadow"
+          >
+            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>New</span>
+          </button>
         </div>
 
         {/* Template Selector & New Template Button */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 md:flex-wrap no-scrollbar -mx-1 px-1">
           {routines.map((r) => (
             <button
               key={r.id}
               onClick={() => setActiveRoutineId(r.id)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3.5 py-2 sm:py-1.5 rounded-xl sm:rounded-lg text-xs font-bold whitespace-nowrap shrink-0 transition-all ${
                 activeRoutine?.id === r.id
                   ? 'neu-teal-btn text-white shadow'
                   : 'neu-pill-btn text-slate-700 dark:text-slate-300'
@@ -172,7 +185,7 @@ export default function DailyRoutine() {
 
           <button
             onClick={() => openTemplateModal(null)}
-            className="neu-pill-btn px-3 py-1.5 rounded-lg text-xs font-bold text-brand-teal hover:bg-brand-teal hover:text-white flex items-center gap-1"
+            className="hidden md:flex neu-pill-btn px-3 py-1.5 rounded-lg text-xs font-bold text-brand-teal hover:bg-brand-teal hover:text-white items-center gap-1 shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Routine</span>
@@ -182,14 +195,14 @@ export default function DailyRoutine() {
 
       {/* Success Notification Banner */}
       {successBanner && (
-        <div className="clay-card p-4 bg-emerald-500/15 border border-emerald-500/40 text-emerald-800 dark:text-emerald-300 flex items-center justify-between animate-in fade-in duration-200">
-          <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold">
-            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+        <div className="clay-card p-3.5 sm:p-4 bg-emerald-500/15 border border-emerald-500/40 text-emerald-800 dark:text-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 animate-in fade-in duration-200">
+          <div className="flex items-start sm:items-center gap-2.5 text-xs sm:text-sm font-bold">
+            <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 shrink-0 mt-0.5 sm:mt-0" />
             <span>{successBanner}</span>
           </div>
           <button
             onClick={() => navigate('/today')}
-            className="neu-pill-btn px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1"
+            className="neu-pill-btn px-3 py-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center justify-center gap-1 self-end sm:self-auto shrink-0"
           >
             <span>View Timeline</span>
             <ArrowRight className="w-3 h-3" />
@@ -199,22 +212,31 @@ export default function DailyRoutine() {
 
       {/* Active Routine Details */}
       {activeRoutine && (
-        <div className="clay-card p-5 sm:p-6 shadow-neu-card space-y-6">
+        <div className="clay-card p-4 sm:p-6 shadow-neu-card space-y-4 sm:space-y-6">
           {/* Top Bar inside Card */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-300/40 dark:border-slate-700/60 gap-4">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white">
-                  {activeRoutine.name}
-                </h3>
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                  {activeRoutine.tag}
-                </span>
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between pb-3.5 sm:pb-4 border-b border-slate-300/40 dark:border-slate-700/60 gap-3.5 sm:gap-4">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white break-words">
+                    {activeRoutine.name}
+                  </h3>
+                  <span className="text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                    {activeRoutine.tag}
+                  </span>
+                </div>
+                {activeRoutine.description && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                    {activeRoutine.description}
+                  </p>
+                )}
+              </div>
 
-                {/* Edit & Delete Template Buttons */}
+              {/* Edit & Delete Template Buttons */}
+              <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => openTemplateModal(activeRoutine)}
-                  className="p-1 text-slate-400 hover:text-brand-teal transition-colors"
+                  className="p-2 sm:p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-700/60 text-slate-400 hover:text-brand-teal transition-colors"
                   title="Edit Template Info"
                 >
                   <Edit3 className="w-4 h-4" />
@@ -226,7 +248,7 @@ export default function DailyRoutine() {
                       deleteRoutine(activeRoutine.id);
                       setActiveRoutineId(routines[0]?.id || '');
                     }}
-                    className="p-1 text-slate-400 hover:text-brand-coral transition-colors"
+                    className="p-2 sm:p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-brand-coral transition-colors"
                     title="Delete Routine Template"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -236,76 +258,123 @@ export default function DailyRoutine() {
             </div>
 
             {/* Quick Apply & Add Block Buttons */}
-            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full lg:w-auto">
               <button
                 onClick={() => openBlockModal(null)}
-                className="neu-teal-btn px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow flex-1 sm:flex-none"
+                className="col-span-2 sm:col-span-1 neu-teal-btn px-3.5 py-2.5 sm:py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow rounded-xl"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                 <span>Add Block</span>
               </button>
 
               <button
                 onClick={() => handleApply(format(new Date(), 'yyyy-MM-dd'), 'Today')}
-                className="neu-pill-btn px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
+                className="neu-pill-btn px-3 py-2.5 sm:py-2 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 rounded-xl"
               >
-                <Calendar className="w-3.5 h-3.5 text-brand-teal" />
-                <span>Apply to Today</span>
+                <Calendar className="w-3.5 h-3.5 text-brand-teal shrink-0" />
+                <span className="truncate">Apply Today</span>
               </button>
 
               <button
                 onClick={() =>
                   handleApply(format(addDays(new Date(), 1), 'yyyy-MM-dd'), 'Tomorrow')
                 }
-                className="neu-pill-btn px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 w-full sm:w-auto"
+                className="neu-pill-btn px-3 py-2.5 sm:py-2 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 rounded-xl"
               >
-                <Calendar className="w-3.5 h-3.5 text-brand-blue" />
-                <span>Apply to Tomorrow</span>
+                <Calendar className="w-3.5 h-3.5 text-brand-blue shrink-0" />
+                <span className="truncate">Apply Tomorrow</span>
               </button>
             </div>
           </div>
 
           {/* Routine Blocks List */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <h4 className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">
                 Schedule Blocks ({activeRoutine.blocks.length})
               </h4>
               <span className="text-[11px] text-slate-400">
-                Click pencil to edit or trash to delete
+                <span className="sm:hidden">Tap block to edit</span>
+                <span className="hidden sm:inline">Click pencil to edit or trash to delete</span>
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
               {[...activeRoutine.blocks]
                 .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
                 .map((block) => (
                   <div
                     key={block.id}
                     onClick={() => openBlockModal(block)}
-                    className="p-3.5 rounded-xl bg-white/60 dark:bg-slate-800/60 border border-white/80 dark:border-slate-700/60 flex items-center justify-between shadow-sm hover:shadow-md transition-all group cursor-pointer hover:border-brand-teal/50"
+                    className="p-3 sm:p-3.5 rounded-2xl sm:rounded-xl bg-white/65 dark:bg-slate-800/65 border border-white/80 dark:border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 shadow-sm hover:shadow-md transition-all group cursor-pointer hover:border-brand-teal/50 active:scale-[0.99] sm:active:scale-100"
                   >
+                    {/* Mobile Top Row: Time + Type + Quick Actions */}
+                    <div className="flex items-center justify-between gap-2 sm:hidden">
+                      <div className="flex items-center gap-2">
+                        <div className="px-2.5 py-1 rounded-lg neu-inset text-xs font-extrabold font-mono text-brand-teal shrink-0">
+                          {formatTo12Hour(block.time)}
+                        </div>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${getBlockBadgeColor(
+                            block.type
+                          )}`}
+                        >
+                          {block.type}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openBlockModal(block);
+                          }}
+                          className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-brand-teal transition-colors"
+                          title="Edit Block"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteRoutineBlock(activeRoutine.id, block.id);
+                          }}
+                          className="p-2 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-brand-coral transition-colors"
+                          title="Delete Block"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Desktop Time Pill + Title/Meta (Full width on mobile) */}
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="px-2.5 py-1.5 rounded-lg neu-inset text-xs font-extrabold font-mono text-brand-teal shrink-0">
+                      <div className="hidden sm:block px-2.5 py-1.5 rounded-lg neu-inset text-xs font-extrabold font-mono text-brand-teal shrink-0">
                         {formatTo12Hour(block.time)}
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <h5 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white truncate group-hover:text-brand-teal transition-colors">
+                        <h5 className="text-sm font-bold text-slate-800 dark:text-white leading-snug break-words sm:truncate group-hover:text-brand-teal transition-colors">
                           {block.title}
                         </h5>
-                        <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
+                        <div className="flex items-center flex-wrap gap-2 mt-1 sm:mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                          <span className="flex items-center gap-1 font-medium">
+                            <Clock className="w-3 h-3 text-brand-teal/80" />
                             {block.duration} mins
                           </span>
                           <span>•</span>
-                          <span className="truncate">{block.subject}</span>
+                          <span className="truncate font-semibold text-slate-600 dark:text-slate-300">
+                            {block.subject}
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                    {/* Desktop Type Badge + Actions */}
+                    <div className="hidden sm:flex items-center gap-1.5 shrink-0 ml-2">
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${getBlockBadgeColor(
                           block.type
@@ -466,7 +535,7 @@ export default function DailyRoutine() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Start Time <span className="text-brand-teal font-mono">({formatTo12Hour(blockForm.time)})</span>
@@ -495,7 +564,7 @@ export default function DailyRoutine() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Block Type
